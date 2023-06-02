@@ -5,7 +5,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from "react";
 import { useEffect } from "react";
 
-import FeaturedPost from '../components/FeaturedPost';
 import Header from '../components/Header';
 import MainFeaturedPost from '../components/MainFeaturedPost';
 import Footer from '../components/Footer';
@@ -26,40 +25,32 @@ const mainFeaturedPost = {
   title: 'STEAM Intercultural',
   description:
     "Página web responsiva educativa basada en el modelo STEAM dirigida a hablantes del náhuatl de 10 a 15 años, permitiéndoles aprender con actividades interactivas en su lengua materna.",
-  image: 'https://source.unsplash.com/random',
+  image: 'https://picsum.photos/800/200?random',
   imageText: 'main image description',
   linkText: 'Crear una cuenta gratis',
 };
 
-const featuredPosts = {
-    title: 'STEAM',
-    date: 'Nov 12',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-    image: 'https://source.unsplash.com/random',
-    imageLabel: 'Image Text',
-};
 
 const cards = [
   {
     title: "Aylín Aldana y Athziri Rodríguez",
     subtitle: "Desarrollo",
     description: "mmmmmmmmmmmmmmmmmmm",
-    image: "https://source.unsplash.com/random",
+    image: "https://picsum.photos/200/200?random",
     imageLabel: "Image Text"
   },
   {
     title: "María Obdulia González Fernández",
     subtitle: "Mentoría",
     description: "mmmmmmmmmmmmmmmmm",
-    image: "https://source.unsplash.com/random",
+    image: "https://picsum.photos/200/200?random",
     imageLabel: "Image Text"
   },
   {
     title: "Nombre",
     subtitle: "Contenido y traducción",
-    description: "mmmmmmmmmmmmmmmmm",
-    image: "https://source.unsplash.com/random",
+    description: "Traducción de la página a lengua náhuatl",
+    image: "https://picsum.photos/200/200?random",
     imageLabel: "Image Text"
   }
 ];
@@ -95,7 +86,6 @@ export const SteamPage = () => {
       }, 6000);
     }
   }, [current, autoPlay]);
-
 
   return (
     <ThemeProvider theme={theme}>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {Paper, Box, Typography, Grid, Link} from '@mui/material';
+import { NavLink } from 'react-router-dom';
 
 function MainFeaturedPost(props) {
   const { post } = props;
@@ -45,9 +46,12 @@ function MainFeaturedPost(props) {
             <Typography variant="h5" color="inherit" paragraph>
               {post.description}
             </Typography>
-            <Link variant="subtitle1" href="#">
-              {post.linkText}
-            </Link>
+
+            <NavLink to="auth/new">
+              <Link variant="subtitle1" href="#">
+                {post.linkText}
+              </Link>
+            </NavLink>
           </Box>
         </Grid>
       </Grid>

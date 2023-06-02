@@ -12,7 +12,7 @@ export const useForm = ( initialForm = {}, formValidations={} ) => {
     useEffect(() => {
       setFormState(initialForm);
     
-    }, [initialForm])  //Cuando el initialForm (la nota activa) cambia quiero que se dispare este efecto
+    }, [initialForm])  //Cuando el initialForm cambia quiero que se dispare este efecto
     
     
     const isFormValid = useMemo( () => {

@@ -4,6 +4,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from "react-router-dom";
 import { useEffect } from 'react';
+import { useAuthStore, useForm } from '../../hooks';
 
 function Copyright(props) {
   return (
@@ -21,18 +22,42 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+const registerFormFields = {
+  registerName: '',
+  registerPassword: ''
+}
+
 export default function SignUp() {
+
+  const { startRegister, errorMessage } = useAuthStore();
+  const { registerName, registerPassword, onInputChange:onRegisterInputChange } = useForm(registerFormFields);
   
   const registerSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      email: data.get('email'),
-      password: data.get('password'),
-      password2: data.get('password2')
-    });
-  };
+    startRegister({
+      username: registerName, 
+      password: registerPassword
+    })
+}
+
+useEffect(() => {
+  if(errorMessage !== undefined){
+    Swal.fire('Error en la autenticación', errorMessage, 'error' );
+  }
+
+}, [errorMessage])
+
+
+/*const registerSubmit = (event) => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  console.log({
+    name: data.get('name'),
+    email: data.get('email'),
+    password: data.get('password'),
+    password2: data.get('password2')
+  });
+};*/
 
 
   return (
@@ -58,11 +83,13 @@ export default function SignUp() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
-                  name="name"
+                  name="registerName"
                   required
+                  value={registerName}
+                  onChange={onRegisterInputChange}
                   fullWidth
-                  id="name"
-                  label="Nombre"
+                  id="username"
+                  label="Nombre de usuario"
                   autoFocus
                 />
               </Grid>
@@ -71,35 +98,16 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Correo electrónico"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
+                  name="registerPassword"
                   label="Contraseña"
                   type="password"
                   id="password"
+                  value={registerPassword}
+                  onChange={onRegisterInputChange}
                   autoComplete="new-password"
                 />
               </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password2"
-                  label="Repita la contraseña"
-                  type="password"
-                  id="password2"
-                  autoComplete="new-password"
-                />
-              </Grid>
 
             </Grid>
             <Button

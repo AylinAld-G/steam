@@ -22,16 +22,39 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+const loginFormFields = {
+  loginName: '',
+  loginPassword: ''
+}
+
 export default function LoginPage() {
 
+  const { startLogin, errorMessage} = useAuthStore();
+
+  const { loginName, loginPassword, onInputChange:onLoginInputChange } = useForm(loginFormFields);
+
   const loginSubmit = (event) => {
+    event.preventDefault();
+    startLogin({ 
+      username: loginName, 
+      password: loginPassword});
+  };
+
+  useEffect(() => {
+    if(errorMessage !== undefined){
+      Swal.fire('Error en la autenticación', errorMessage, 'error' );
+    }
+  
+  }, [errorMessage])
+
+  /*const loginSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
     });
-  };
+  };*/
 
   return (
     <ThemeProvider theme={theme}>
@@ -56,20 +79,24 @@ export default function LoginPage() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Correo electrónico"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Nombre de usuario"
+              name="loginName"
+              value={loginName}
+              onChange={onLoginInputChange}
+              autoComplete="given-name"
               autoFocus
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              name="password"
+              name="loginPassword"
               label="Contraseña"
               type="password"
               id="password"
+              value={loginPassword}
+              onChange={onLoginInputChange}
               autoComplete="current-password"
             />
 

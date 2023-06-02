@@ -1,23 +1,24 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import {SteamRoutes} from '../steam/routes/SteamRoutes';
 import {AuthRoutes} from '../auth/routes';
+import { useAuthStore } from '../hooks';
 
 
 export const AppRouter = () => {
 
+  const {status} = useAuthStore();
+
   return (
     <Routes>
       
-        <Route path="/*" element={<SteamRoutes/>}/>
-      
-        <Route path="/auth/*" element={<AuthRoutes/>}/>
 
-      {/*Login y Registro */}
-      {/*<Route path="/auth/login/" element={<LoginPage/>}/>
-      <Route path="auth/login/*" element={<Navigate to="auth/login"/>}/>
+      {
+        (status==='authenticated')
+        ? <Route path="/*" element={<SteamRoutes/>}/>
+        : <Route path="/auth/*" element={<AuthRoutes/>}/>
+      }
 
-      <Route path="auth/new/" element={<SignUp/>}/>
-      <Route path="auth/new/*" element={<Navigate to="auth/new"/>}/>*/}
+      <Route path='/*' element={<SteamRoutes/>}/>
 
     </Routes>
   )
