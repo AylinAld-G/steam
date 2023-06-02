@@ -1,8 +1,6 @@
-#STEAM Int
+#  STEAM Int
 
-
-
-##Run application
+## Run application
 yarn dev
 
 ## Install required dependencies:
