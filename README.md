@@ -1,5 +1,10 @@
 #  STEAM Int
 
+## Create app
+1. Install yarn: npm install --global yarn
+2. yarn create vite
+3. yarn
+
 ## Run application
 yarn dev
 
