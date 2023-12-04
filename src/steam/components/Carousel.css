@@ -104,3 +104,56 @@
   .pagination_dot-active {
     background-color: steelblue;
   }
+
+ @media (max-width: 1088px) {
+    .carousel {
+      max-height: 400px; 
+      right: 2%;
+      margin-right: 9%;
+    }
+    
+  }
+
+  @media (max-width: 650px) {
+    .carousel {
+      max-height: 350px; 
+      left:2%;
+      margin-left: 2%;
+      margin-right: 30%;
+    }
+    
+  }
+
+  @media (max-width: 409px) {
+    .carousel {
+      max-height: 330px; 
+      margin-left:3%;
+      margin-right: 9%;
+    }
+    
+  }
+
+  @media (max-width: 305px) {
+    .carousel {
+      max-height: 300px; 
+      margin-left:5%;
+      margin-right: 6%;
+    }
+    
+  }
+
+  @media (max-width: 274px) {
+    .carousel {
+      margin-left:7%;
+      margin-right: 5%;
+    }
+    
+  }
+
+  @media (max-width: 289px) {
+    .carousel { 
+      margin-left:6%;
+      margin-right: 5%;
+    }
+    
+  }
