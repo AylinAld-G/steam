@@ -1,3 +1,22 @@
 .box-shadow{
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
 }
+
+/* Personalizar Scroll - No soportado: Firefox, IE, Edge */
+/* Width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f2f2f2;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #696969;
+  border-radius: 10px;
+}
