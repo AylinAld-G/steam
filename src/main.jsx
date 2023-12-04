@@ -5,6 +5,7 @@ import { Steam } from './Steam';
 import './styles.css'
 import { store } from './store/store';
 import { Provider } from 'react-redux';
+import './i18n.js';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -15,4 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </Provider>
   </React.StrictMode>
 )
+
 
