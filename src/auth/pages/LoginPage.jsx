@@ -4,15 +4,16 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
-import { useAuthStore, useForm } from '../../hooks';
 import {Link} from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import { useAuthStore, useForm } from '../../hooks';
 
 function Copyright(props) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+    <Typography variant="body2" color="text.secondary" align="center" {...props} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link to="/" color="inherit" sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>
+        STEAM Intercultural
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -47,6 +48,8 @@ export default function LoginPage() {
   
   }, [errorMessage])
 
+  const { t } = useTranslation();
+
   /*const loginSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -72,7 +75,7 @@ export default function LoginPage() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Iniciar sesión
+            {t("login")}
           </Typography>
           <Box component="form" onSubmit={loginSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -80,7 +83,7 @@ export default function LoginPage() {
               required
               fullWidth
               id="username"
-              label="Nombre de usuario"
+              label={t("userName")}
               name="loginName"
               value={loginName}
               onChange={onLoginInputChange}
@@ -92,7 +95,7 @@ export default function LoginPage() {
               required
               fullWidth
               name="loginPassword"
-              label="Contraseña"
+              label={t("psswd")}
               type="password"
               id="password"
               value={loginPassword}
@@ -106,11 +109,11 @@ export default function LoginPage() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Iniciar sesión
+              {t("login")}
             </Button>
             <Grid container>
               <Grid item>
-                <Link to="/auth/new">Crear una cuenta</Link>
+                <Link to="/auth/new">{t("signUp")}</Link>
               </Grid>
             </Grid>
           </Box>
