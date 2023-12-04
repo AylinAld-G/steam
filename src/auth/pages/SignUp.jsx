@@ -1,17 +1,20 @@
 import * as React from 'react';
-import {Avatar,Button,CssBaseline,TextField,Grid,Box,Typography,Container} from '@mui/material';
+import {Avatar,Button,CssBaseline,TextField,Grid,Box,Typography,Container, OutlinedInput, InputLabel, InputAdornment, IconButton} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useEffect } from 'react';
 import { useAuthStore, useForm } from '../../hooks';
+import { useTranslation } from 'react-i18next';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link to="/" color="inherit">
+        STEAM Intercultural
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -24,21 +27,34 @@ const theme = createTheme();
 
 const registerFormFields = {
   registerName: '',
+  registerEmail: '',
   registerPassword: ''
 }
 
 export default function SignUp() {
 
-  const { startRegister, errorMessage } = useAuthStore();
-  const { registerName, registerPassword, onInputChange:onRegisterInputChange } = useForm(registerFormFields);
+  const { startRegister, errorMessage, } = useAuthStore();
+  const { registerName, registerEmail, registerPassword, onInputChange:onRegisterInputChange } = useForm(registerFormFields);
   
+  const {t} = useTranslation();
+
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
   const registerSubmit = (event) => {
     event.preventDefault();
+    //console.log({registerName, registerEmail, registerPassword} )
     startRegister({
-      username: registerName, 
+      username: registerName,
+      email: registerEmail, 
       password: registerPassword
     })
 }
+
 
 useEffect(() => {
   if(errorMessage !== undefined){
@@ -46,18 +62,6 @@ useEffect(() => {
   }
 
 }, [errorMessage])
-
-
-/*const registerSubmit = (event) => {
-  event.preventDefault();
-  const data = new FormData(event.currentTarget);
-  console.log({
-    name: data.get('name'),
-    email: data.get('email'),
-    password: data.get('password'),
-    password2: data.get('password2')
-  });
-};*/
 
 
   return (
@@ -76,11 +80,11 @@ useEffect(() => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Registro
+            {t("register")}
           </Typography>
           <Box component="form" noValidate onSubmit={registerSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} >
                 <TextField
                   autoComplete="given-name"
                   name="registerName"
@@ -89,38 +93,65 @@ useEffect(() => {
                   onChange={onRegisterInputChange}
                   fullWidth
                   id="username"
-                  label="Nombre de usuario"
+                  label={t("userName")}
                   autoFocus
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} >
                 <TextField
+                  autoComplete="email"
+                  name="registerEmail"
                   required
-                  fullWidth
-                  name="registerPassword"
-                  label="Contraseña"
-                  type="password"
-                  id="password"
-                  value={registerPassword}
+                  value={registerEmail}
                   onChange={onRegisterInputChange}
-                  autoComplete="new-password"
+                  fullWidth
+                  id="email"
+                  label="Correo"
                 />
+              </Grid>
+
+              <Grid item xs={12}>
+                <InputLabel htmlFor="outlined-adornment-password"></InputLabel>
+                  <OutlinedInput
+                    required
+                    id='password'
+                    label={t("psswd")}
+                    type={showPassword ? 'text' : 'password'}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    value={registerPassword}
+                    name='registerPassword'
+                    fullWidth
+                    autoComplete='new-password'
+                    onChange={onRegisterInputChange}
+                  />
               </Grid>
 
 
             </Grid>
             <Button
               type="submit"
+              href='verification'
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Crear cuenta
+              {t("createAcc")}
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link to="/auth/login">¿Ya tienes una cuenta? Inicia sesión</Link>
+                <Link to="/auth/login">{t("loginLnk")}</Link>
               </Grid>
             </Grid>
           </Box>
