@@ -1,9 +1,10 @@
 import * as React from 'react';
-import {CssBaseline, Grid, Container, Button, Typography, Box, Stack, ToggleButtonGroup, ToggleButton} from '@mui/material';
-import {Instagram, Facebook, Twitter} from '@mui/icons-material';
+import {CssBaseline, Grid, Container, Typography, Box, Stack, ToggleButtonGroup, ToggleButton} from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from "react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import ScrollToTop from 'react-scroll-to-top'
 
 import Header from '../components/Header';
 import MainFeaturedPost from '../components/MainFeaturedPost';
@@ -11,14 +12,15 @@ import Footer from '../components/Footer';
 import PersonCard from '../components/PersonCard';
 import Carousel from '../components/Carousel';
 import { areas } from "../components/Data";
+import { ContactModal } from '../components/ContactModal';
 
 
 const sections = [
-  { title: 'Ciencia', url: '#' },
-  { title: 'Tecnología', url: '#' },
-  { title: 'Ingeniería', url: '#' },
-  { title: 'Arte', url: '#' },
-  { title: 'Matemáticas', url: '#' }
+  { title: 'science', url: '/science', icon: '../../../public/images/scienceIcon.png' },
+  { title: 'tech', url: '/tech', icon: '../../../public/images/technoIcon.png'  },
+  { title: 'eng', url: '/engine', icon: '../../../public/images/engineIcon.png'  },
+  { title: 'art', url: '/art', icon: '../../../public/images/artIcon.jpg'  },
+  { title: 'math', url: '/math', icon: '../../../public/images/mathIcon.jpg'  }
 ];
 
 const mainFeaturedPost = {
@@ -34,38 +36,28 @@ const mainFeaturedPost = {
 const cards = [
   {
     title: "Aylín Aldana y Athziri Rodríguez",
-    subtitle: "Desarrollo",
-    description: "mmmmmmmmmmmmmmmmmmm",
-    image: "https://picsum.photos/200/200?random",
+    subtitle: "dev",
+    image1: "https://picsum.photos/200/200?random",
+    image2: "https://picsum.photos/250/250?random",
     imageLabel: "Image Text"
   },
   {
     title: "María Obdulia González Fernández",
-    subtitle: "Mentoría",
-    description: "mmmmmmmmmmmmmmmmm",
+    subtitle: "mentor",
     image: "https://picsum.photos/200/200?random",
     imageLabel: "Image Text"
   },
   {
     title: "Nombre",
-    subtitle: "Contenido y traducción",
-    description: "Traducción de la página a lengua náhuatl",
+    subtitle: "trad",
     image: "https://picsum.photos/200/200?random",
     imageLabel: "Image Text"
   }
 ];
 
 
-const footerInfo = {
-  social: [
-    { name: 'Instagram', icon: Instagram },
-    { name: 'Twitter', icon: Twitter },
-    { name: 'Facebook', icon: Facebook },
-  ]
-};
-
-
 const theme = createTheme();
+
 
 export const SteamPage = () => {
   
@@ -83,15 +75,17 @@ export const SteamPage = () => {
     if (autoPlay) {
       timeOut = setTimeout(() => {
         setCurrent((current) => (current === areas.length - 1 ? 0 : current + 1));
-      }, 6000);
+      }, 7000);
     }
   }, [current, autoPlay]);
+
+  const { t } = useTranslation();
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="STEAM" sections={sections} />
+        <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, icon: section.icon }))}/> {/* Font family: Comfortaa*/}
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
 
@@ -106,15 +100,19 @@ export const SteamPage = () => {
                 align="center"
                 color="text.primary"
                 gutterBottom
+                sx={{ fontFamily: 'Didact Gothic, sans-serif', fontSize: { xs: '2.5rem', md: '4rem',  }, marginLeft:{xs: "6%"}, 
+                '@media (max-width: 350px )': {
+                  marginLeft: '12%'
+                } }}
               >
-                Steam Intercultural Page
+                STEAM Intercultural Page
             </Typography>
 
 
-          <Grid container spacing={4} sx={{ mt: 2 }}>
+          <Grid container spacing={4} sx={{ mt: 2 }} justifyContent="center" alignItems="center">
             {/* Carousel */}
 
-            <Grid container justifyContent="center">
+            <Grid container justifyContent="center" alignItems="center">
               <ToggleButtonGroup
                 value={current}
                 color="primary"
@@ -125,14 +123,18 @@ export const SteamPage = () => {
                   flexWrap: "wrap",
                   justifyContent: "center",
                   gap: 1,
+                  marginLeft:{xs: "10%"},
+                  '@media (max-width: 370px )': {
+                    marginLeft: '15%'
+                  }
                 }}
               >
-                <ToggleButton value={0}>STEAM</ToggleButton>
-                <ToggleButton value={1}>Ciencia</ToggleButton>
-                <ToggleButton value={2}>Tecnología</ToggleButton>
-                <ToggleButton value={3}>Ingeniería</ToggleButton>
-                <ToggleButton value={4}>Arte</ToggleButton>
-                <ToggleButton value={5}>Matemáticas</ToggleButton>
+                <ToggleButton value={0} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>STEAM</ToggleButton>
+                <ToggleButton value={1} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>{t("science")}</ToggleButton>
+                <ToggleButton value={2} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>{t("tech")}</ToggleButton>
+                <ToggleButton value={3} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>{t("eng")}</ToggleButton>
+                <ToggleButton value={4} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>{t("art")}</ToggleButton>
+                <ToggleButton value={5} sx={{ fontFamily: 'Didact Gothic, sans-serif' }}>{t("math")}</ToggleButton>
               </ToggleButtonGroup>
 
             </Grid>
@@ -142,6 +144,9 @@ export const SteamPage = () => {
                 sx={{
                   maxWidth: "100%",
                   justifyContent: "center",
+                  '@media (max-width: 1088px)': {
+                    height: '50%'
+                  },
                 }}
               />
             </Grid>
@@ -163,49 +168,76 @@ export const SteamPage = () => {
                 variant="h3"
                 align="center"
                 color="text.primary"
+                sx={{ fontFamily: 'Didact Gothic, sans-serif',
+                '@media (max-width: 400px)': { // Estilos para pantallas pequeñas
+                  fontSize: '2.45rem', // Cambia el tamaño de fuente para pantallas pequeñas
+                },
+                '@media (max-width: 290px)': { // Estilos para pantallas aún más pequeñas
+                  fontSize: '2.10rem', // Cambia el tamaño de fuente para pantallas muy pequeñas
+                }, }}
             >
-                Personas implicadas
+                {t("contributors")}
             </Typography>
           </Container>
           </Box>
 
           <Grid container spacing={4}>
-          {cards.map((post) => (
+          {cards.map((post, index) => (
             <Grid item key={post.title} xs={12} sm={6} md={4}>
-            <PersonCard post={post} />
+            <PersonCard post={{
+                  ...post,
+                  subtitle: t(post.subtitle),
+              }} 
+              isFirstCard={index === 0}
+              />
           </Grid>
           ))}
           </Grid>
 
-          <Box
-          sx={{
-            bgcolor: 'background.paper',
-            pt: 8,
-            pb: 6,
-          }}
-        >
-          <Container maxWidth="sm">
-            <Typography
-              component="h2"
-              variant="h3"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Contacto
-            </Typography>
-            <Typography variant="h5" align="center" color="text.secondary" paragraph>
-              Manda tu feedback estamos constantemente escuchando y mejorando la página
-            </Typography>
-            <Stack
-              sx={{ pt: 4 }}
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-            >
-              <Button variant="contained">Contactar</Button>
-            </Stack>
-          </Container>
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          pt: 8,
+          pb: 6,
+        }}
+      >
+        <Container maxWidth="sm">
+          <Typography
+            component="h2"
+            variant="h3"
+            align="center"
+            color="text.primary"
+            gutterBottom
+            sx={{ fontFamily: 'Didact Gothic, sans-serif',
+            '@media (max-width: 380px)': { // Estilos para pantallas pequeñas
+              fontSize: '2rem', // Cambia el tamaño de fuente para pantallas pequeñas
+            }, }}
+          >
+            {t("contact")}
+          </Typography>
+          <Typography variant="h5" align="center" color="text.secondary" 
+          sx={{ fontFamily: 'Didact Gothic, sans-serif',
+          '@media (max-width: 380px)': { // Estilos para pantallas pequeñas
+            fontSize: '1.25rem', // Cambia el tamaño de fuente para pantallas pequeñas
+          },
+          }} paragraph>
+            Si tienes dudas, ideas para mejorar, o simplemente quieres compartir tu experiencia con STEAM Intercultural, no dudes en ponerte en contacto con nosotros haciendo click en el botón inferior.
+          </Typography>
+          <Stack
+            sx={{ pt: 4 }}
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+          >
+            <ContactModal/>
+          </Stack>
+        </Container>
+        </Box>
+
+        <Box sx={{ '& > :not(style)': { m: 6 },}}>
+          <ScrollToTop smooth color="#FFF" height='22px'
+            style={{borderRadius:"30px", width: "50px", height:"50px", backgroundColor:"#2979ff", padding:"5px", 
+            bottom: '1px', right: '1px',}}/>
         </Box>
           
         </main>
@@ -214,7 +246,6 @@ export const SteamPage = () => {
       <Footer
         title="STEAM Intercultural"
         description="2023"
-        social={footerInfo.social}
       />
     </ThemeProvider>
   );
