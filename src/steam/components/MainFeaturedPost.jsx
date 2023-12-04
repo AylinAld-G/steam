@@ -1,10 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Paper, Box, Typography, Grid, Link} from '@mui/material';
+import {Paper, Box, Typography, Grid, Link, Button} from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
 function MainFeaturedPost(props) {
   const { post } = props;
+
 
   return (
     <Paper
@@ -17,9 +18,9 @@ function MainFeaturedPost(props) {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         backgroundImage: `url(${post.image})`,
+        marginTop: "2%"
       }}
     >
-      {/* Increase the priority of the hero background image */}
       {<img style={{ display: 'none' }} src={post.image} alt={post.imageText} />}
       <Box
         sx={{
@@ -40,17 +41,23 @@ function MainFeaturedPost(props) {
               pr: { md: 0 },
             }}
           >
-            <Typography component="h1" variant="h3" color="inherit" gutterBottom>
+            <Typography component="h1" variant="h3" color="inherit" gutterBottom 
+            sx={{ fontFamily: 'Didact Gothic, sans-serif',
+                  fontSize: { xs: '2rem', md: '3.75rem', lg: '4rem' }, // Tamaño de fuente para diferentes tamaños de pantalla
+                  marginBottom: { xs: '16px', md: '24px' },}}>
               {post.title}
             </Typography>
-            <Typography variant="h5" color="inherit" paragraph>
+            <Typography variant="h5" color="inherit" paragraph 
+              sx={{ fontFamily: 'Didact Gothic, sans-serif', fontSize: { xs: '1rem', md: '1.25rem', lg: '1.75rem'} }}>
               {post.description}
             </Typography>
 
             <NavLink to="auth/new">
-              <Link variant="subtitle1" href="#">
+              <Button variant="contained" 
+              sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"30px", fontSize: { xs: '0.875rem', md: '1rem' } }}
+              >
                 {post.linkText}
-              </Link>
+              </Button>
             </NavLink>
           </Box>
         </Grid>
