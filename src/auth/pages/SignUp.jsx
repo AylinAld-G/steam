@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Avatar,Button,CssBaseline,TextField,Grid,Box,Typography,Container, OutlinedInput, InputLabel, InputAdornment, IconButton} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from 'react';
 import { useAuthStore, useForm } from '../../hooks';
 import { useTranslation } from 'react-i18next';
@@ -33,10 +33,11 @@ const registerFormFields = {
 
 export default function SignUp() {
 
-  const { startRegister, errorMessage, } = useAuthStore();
+  const { startRegister, user, errorMessage,  } = useAuthStore();
   const { registerName, registerEmail, registerPassword, onInputChange:onRegisterInputChange } = useForm(registerFormFields);
   
   const {t} = useTranslation();
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -45,14 +46,17 @@ export default function SignUp() {
     event.preventDefault();
   };
 
-  const registerSubmit = (event) => {
+
+  const registerSubmit = async (event) => {
     event.preventDefault();
     //console.log({registerName, registerEmail, registerPassword} )
-    startRegister({
-      username: registerName,
-      email: registerEmail, 
-      password: registerPassword
-    })
+      startRegister({
+        username: registerName,
+        email: registerEmail,
+        password: registerPassword
+      });
+
+
 }
 
 
@@ -140,15 +144,17 @@ useEffect(() => {
 
 
             </Grid>
-            <Button
-              type="submit"
-              href='verification'
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              {t("createAcc")}
-            </Button>
+
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                {t("createAcc")}
+              </Button>
+
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/auth/login">{t("loginLnk")}</Link>
