@@ -3,7 +3,7 @@ import {Button, CssBaseline,TextField, Box,Typography,Container, Avatar, Paper, 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useAuthStore, useForm } from '../../hooks';
 import { Close, VpnKey } from '@mui/icons-material';
@@ -24,17 +24,19 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-const verificationFormFields = {
-    verificationCode: '',
-  }
-  
 
 export const VerificationCode = () => {
-    const { checkVerificationCode, user, errorMessage } = useAuthStore();
+    const { checkVerificationCode, errorMessage } = useAuthStore();
+
+    const { uid } = useParams();
+    const location= useLocation();
+
 
     const [formValues, setFormValues] = useState({
       code: ''
     });
+
+    const [loading, setLoading] = useState(false);
 
   const onInputChanged = (event) => {
     const inputValue = event.target.value;
@@ -48,14 +50,21 @@ export const VerificationCode = () => {
     const {t} = useTranslation();
     const [showWrongAlert, setShowWrongAlert] = useState(false);
     const [open, setOpen] = React.useState(true);
+    const navigate = useNavigate();
 
-    const codeSubmit = (event) => {
+    const codeSubmit = async (event) => {
         event.preventDefault();
         if (formValues.code.length < 6) {
           setShowWrongAlert(true)
         } else {
-          // checkVerificationCode({ email: user.email, code: formValues.code });
-          console.log(formValues.code);
+          try {
+            setLoading(true); // Mostrar LinearProgress al iniciar la verificación
+            await checkVerificationCode({ uid: uid, code: formValues.code });
+            navigate(`/${uid}/redeem-code`, { replace: true });
+            console.log(formValues.code);
+          } finally {
+            setLoading(false);
+          }
         }
     }
     
@@ -72,6 +81,13 @@ export const VerificationCode = () => {
         <Container component="main" maxWidth="xs">
         <CssBaseline/>
         <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+        
+        {loading && (
+          <Box sx={{ width: '100%', marginTop: '30px' }}>
+            <LinearProgress />
+          </Box>
+        )}
+        
         <Box
           sx={{
             marginTop: 8,
@@ -106,7 +122,7 @@ export const VerificationCode = () => {
             </Collapse>
           )}
         <Typography variant="h6" align="center" color="text.secondary" sx={{ fontFamily: 'Didact Gothic, sans-serif'}}>
-            Se acaba de enviar un código de verificación de 6 dígitos a su correo electrónico {user.email}
+            Se acaba de enviar un código de verificación de 6 dígitos a su correo electrónico
         </Typography>
         <form onSubmit={codeSubmit}>
           <TextField
