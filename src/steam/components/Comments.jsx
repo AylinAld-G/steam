@@ -4,7 +4,7 @@ import { Global } from '@emotion/react';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import { Paper, Stack, TextareaAutosize, Box, Button, Typography, CssBaseline, IconButton, Snackbar, Alert } from '@mui/material';
+import { Paper, Stack, TextareaAutosize, Box, Button, Typography, CssBaseline, IconButton, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import {Delete, Edit} from '@mui/icons-material';
 import { useAuthStore, useForm, useSteamStore } from '../../hooks';
 import { useTranslation } from 'react-i18next';
@@ -115,6 +115,8 @@ function Comments(props) {
 
 
   const container = window !== undefined ? () => window().document.body : undefined;
+  // useMediaQuery hook to detect screen width
+  const isMobile = useMediaQuery('(max-width:290px)');
 
   return (
     <Root>
@@ -133,6 +135,11 @@ function Comments(props) {
           {t("comments")}
         </Button>
       </Box>
+
+      {/*Agregar el Swipeable Drawer solo para celulares (sección condicional para pantallas de 290px)*/}
+      {/*En compu y en tablet view dejar los comentarios en la misma pantalla que el artículo */}
+
+      {isMobile ? (
       <SwipeableDrawer
         container={container}
         anchor="bottom"
@@ -236,8 +243,23 @@ function Comments(props) {
                 </Box>
         </StyledBox>
       </SwipeableDrawer>
+      ) : (
+        <Box sx={{ px: 2, pb: 2, height: '100%', overflow: 'auto' }}>
+          {/* Inline content for larger screens */}
+          {renderCommentsSection()}
+        </Box>
+      )}
     </Root>
   );
+
+
+  function renderCommentsSection(){
+    return(
+      <Typography variant='h6' sx={{ fontWeight: 'bolder', textAlign: 'center', fontFamily: "Didact Gothic, sans-serif" }}>Comentarios</Typography>
+    )
+  }
+
+
 }
 
 Comments.propTypes = {
