@@ -5,13 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
 import { Link, useParams } from 'react-router-dom';
 import Comments from './Comments';
+import { useSteamStore } from '../../hooks';
 
 const sections = [
-  { title: 'science', url: '/science', icon:'../../../public/images/scienceIcon.png' },
-  { title: 'tech', url: '/tech', icon:'../../../public/images/technoIcon.png' },
-  { title: 'eng', url: '/engine', icon:'../../../public/images/engineIcon.png' },
-  { title: 'art', url: '/art', icon:'../../../public/images/artIcon.jpg' },
-  { title: 'math', url: '/math', icon:'../../../public/images/mathIcon.jpg' }
+  { title: 'science', url: '/science/publications', icon: '../../../public/images/scienceIcon.png' },
+  { title: 'tech', url: '/tech/publications', icon: '../../../public/images/technoIcon.png'  },
+  { title: 'eng', url: '/engine/publications', icon: '../../../public/images/engineIcon.png'  },
+  { title: 'art', url: '/art/publications', icon: '../../../public/images/artIcon.jpg'  },
+  { title: 'math', url: '/math/publications', icon: '../../../public/images/mathIcon.jpg'  }
 ];
 
 
