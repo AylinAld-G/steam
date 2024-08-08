@@ -1,6 +1,7 @@
 import * as React from 'react';
-import {CssBaseline, Grid, Container, Typography, Box, Stack, ToggleButtonGroup, ToggleButton} from '@mui/material';
+import {CssBaseline, Grid, Container, Typography, Box, Stack, ToggleButtonGroup, ToggleButton, useMediaQuery, IconButton, Paper, MobileStepper} from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { KeyboardArrowLeft, KeyboardArrowRight} from '@mui/icons-material'
 import { useState } from "react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,12 +17,13 @@ import { ContactModal } from '../components/ContactModal';
 
 
 const sections = [
-  { title: 'science', url: '/science', icon: '../../../public/images/scienceIcon.png' },
-  { title: 'tech', url: '/tech', icon: '../../../public/images/technoIcon.png'  },
-  { title: 'eng', url: '/engine', icon: '../../../public/images/engineIcon.png'  },
-  { title: 'art', url: '/art', icon: '../../../public/images/artIcon.jpg'  },
-  { title: 'math', url: '/math', icon: '../../../public/images/mathIcon.jpg'  }
+  { title: 'science', url: '/publications', category: 'ciencia', icon: '../../../public/images/scienceIcon.png' },
+  { title: 'tech', url: '/publications', category: 'tecnología', icon: '../../../public/images/technoIcon.png'  },
+  { title: 'eng', url: '/publications', category: 'ingeniería', icon: '../../../public/images/engineIcon.png'  },
+  { title: 'art', url: '/publications', category: 'arte', icon: '../../../public/images/artIcon.jpg'  },
+  { title: 'math', url: '/publications', category: 'matemáticas', icon: '../../../public/images/mathIcon.jpg'  }
 ];
+
 
 const mainFeaturedPost = {
   title: 'STEAM Intercultural',
@@ -79,13 +81,26 @@ export const SteamPage = () => {
     }
   }, [current, autoPlay]);
 
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [activeCard, setActiveCard] = React.useState(0);
+  const maxCards = cards.length;
+
+  const handleNext = () => {
+    setActiveCard((prevActiveCard) => prevActiveCard + 1);
+  };
+
+  const handleBack = () => {
+    setActiveCard((prevActiveCard) => prevActiveCard - 1);
+  };
+
   const { t } = useTranslation();
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, icon: section.icon }))}/> {/* Font family: Comfortaa*/}
+        <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, category: section.category, icon: section.icon }))}/> {/* Font family: Comfortaa*/}
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
 
@@ -168,6 +183,7 @@ export const SteamPage = () => {
                 variant="h3"
                 align="center"
                 color="text.primary"
+                marginBottom='0px'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif',
                 '@media (max-width: 400px)': { // Estilos para pantallas pequeñas
                   fontSize: '2.45rem', // Cambia el tamaño de fuente para pantallas pequeñas
@@ -181,18 +197,50 @@ export const SteamPage = () => {
           </Container>
           </Box>
 
-          <Grid container spacing={4}>
-          {cards.map((post, index) => (
-            <Grid item key={post.title} xs={12} sm={6} md={4}>
-            <PersonCard post={{
-                  ...post,
-                  subtitle: t(post.subtitle),
-              }} 
-              isFirstCard={index === 0}
+          {isSmallScreen ? (
+            <Box sx={{ maxWidth: 400, flexGrow: 1 }}>
+              <Paper
+                square
+                elevation={0}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: 50,
+                  pl: 2,
+                  bgcolor: 'background.default',
+                }}
+              >
+
+              </Paper>
+              <Box sx={{ height: 255, maxWidth: 400, width: '100%', p: 2, marginBottom: 10}}>
+                <PersonCard post={{ ...cards[activeCard] }} isFirstCard={activeCard === 0} />
+              </Box>
+              <MobileStepper
+                variant="dots"
+                steps={maxCards}
+                position="static"
+                activeStep={activeCard}
+                nextButton={
+                  <IconButton size="small" onClick={handleNext} disabled={activeCard === maxCards - 1}>
+                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                  </IconButton>
+                }
+                backButton={
+                  <IconButton size="small" onClick={handleBack} disabled={activeCard === 0}>
+                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                  </IconButton>
+                }
               />
-          </Grid>
-          ))}
-          </Grid>
+            </Box>
+          ) : (
+            <Grid container spacing={4}>
+              {cards.map((post, index) => (
+                <Grid item key={post.title} xs={12} sm={6} md={4}>
+                  <PersonCard post={{ ...post }} isFirstCard={index === 0} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
 
       <Box
         sx={{
