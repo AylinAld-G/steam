@@ -213,7 +213,7 @@ export const SteamPage = () => {
 
               </Paper>
               <Box sx={{ height: 255, maxWidth: 400, width: '100%', p: 2, marginBottom: 10}}>
-                <PersonCard post={{ ...cards[activeCard] }} isFirstCard={activeCard === 0} />
+                <PersonCard post={{ ...cards[activeCard], subtitle: t(cards[activeCard].subtitle) }} isFirstCard={activeCard === 0} />
               </Box>
               <MobileStepper
                 variant="dots"
@@ -236,7 +236,7 @@ export const SteamPage = () => {
             <Grid container spacing={4}>
               {cards.map((post, index) => (
                 <Grid item key={post.title} xs={12} sm={6} md={4}>
-                  <PersonCard post={{ ...post }} isFirstCard={index === 0} />
+                  <PersonCard post={{ ...post, subtitle: t(post.subtitle) }} isFirstCard={index === 0} />
                 </Grid>
               ))}
             </Grid>
