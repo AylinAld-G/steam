@@ -1,8 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade} from '@mui/material';
+import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, IconButton} from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import LanguageIcon from '@mui/icons-material/Language';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useAuthStore } from '../../hooks';
 import { useTranslation } from "react-i18next";
 import { useLocation } from 'react-router-dom';
@@ -15,76 +16,70 @@ const lngs = [
 ];
 
 function Header(props) {
-  const { sections, title } = props;
+  const { sections, title, category } = props;
   const [language, setLang] = React.useState('es');
-
-  //Menú del admin
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const location = useLocation();
+  const [activeCategory, setActiveCategory] = useState('defaultCategory');
+  const [isMobile, setIsMobile] = React.useState(false);
+  const {status, startLogout, user} = useAuthStore();
+  const { t, i18n } = useTranslation();
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   // Función para detectar si una sección está resaltada
-  const isSectionActive = (sectionUrl) => {
-    return location.pathname === sectionUrl;
+  const isSectionActive = (sectionCategory) => {
+    return activeCategory === sectionCategory;
   };
 
 
-  const {status, startLogout, user, getRoles} = useAuthStore();
+  const handleSectionClick = (sectionCategory) => {
+    setActiveCategory(sectionCategory);
+    localStorage.setItem('activeCategory', sectionCategory);
+  };
 
-  const roles = getRoles();
-  const isAdmin = roles.includes('Admin');
-  const isCreator = roles.includes('Creator')
+  const toggleDrawer = (open) => (event) => {
+    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawerOpen(open);
+  };
 
   React.useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
-
     if (storedLanguage) {
-      // Si hay un idioma guardado, se establece como idioma predeterminado
       setLang(storedLanguage);
       i18n.changeLanguage(storedLanguage);
     }
-  }, []); // Se ejecutará solo una vez al cargar el componente Header
-
-  const { t, i18n } = useTranslation();
-
-
-  const handleTrans = (code) => {
-    i18n.changeLanguage(code);
-    setLang(code);
-
-    // Guardar el idioma seleccionado en el localStorage
-    localStorage.setItem('language', code);
-  };
-
-  const [isMobile, setIsMobile] = React.useState(false);
-
-  React.useEffect(() => {
-    // Detecta si la pantalla es de 690px o menos
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 690);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 690);
     handleResize();
     window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [i18n]);
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  
+  const drawerList = () => (
+    <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
+      <List>
+        {sections.map((section, index) => (
+          <ListItem button key={section.title} onClick={() => handleSectionClick(section.category)}>
+            <ListItemIcon>
+              <img src={section.icon} alt={section.title} style={{ width: '24px' }} />
+            </ListItemIcon>
+            <ListItemText primary={section.title} />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
 
   return (
     <React.Fragment>
-      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-
-        {
+      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
+  
+      {
           (status==='authenticated')
           
           ? <>
@@ -110,7 +105,7 @@ function Header(props) {
         }
 
         {/*Menú del creator */}
-        {isCreator ?(
+        { status=== 'authenticated' && user.rol_name==='Creator' ?(
           <>
             <Button
             id="fade-button"
@@ -135,11 +130,17 @@ function Header(props) {
               <MenuItem component={NavLink} to="/dashboard" onClick={handleClose}>Tablero</MenuItem>
               <MenuItem onClick={handleClose}>My account</MenuItem>
             </Menu>
+
+            <NavLink to="/">
+            <Button variant="outlined" size="small" onClick={startLogout} sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px" }}>
+              {t("logout")}
+            </Button>
+          </NavLink>
           </>
         ): null}
 
 
-        {isAdmin ?(
+        {status=== 'authenticated' && user.rol_name==='Admin' ?(
           <>
             <Button
             id="fade-button"
@@ -164,6 +165,12 @@ function Header(props) {
               <MenuItem component={NavLink} to="/admin/dashboard" onClick={handleClose}>Tablero</MenuItem>
               <MenuItem onClick={handleClose}>My account</MenuItem>
             </Menu>
+
+            <NavLink to="/">
+            <Button variant="outlined" size="small" onClick={startLogout} sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px" }}>
+              {t("logout")}
+            </Button>
+          </NavLink> 
           </>
         ): null}
 
@@ -181,7 +188,8 @@ function Header(props) {
         </Typography>
 
 
-      <Select
+        {/*Menú de idioma */}
+        <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
           value={language}
@@ -190,6 +198,8 @@ function Header(props) {
           IconComponent={LanguageIcon}
           sx={{border:"none", fontFamily: 'Didact Gothic, sans-serif',
           display: 'inline-flex',
+          marginBottom: 1,
+          marginTop: 1,
           padding: 0,
           '@media (max-width: 380px)': {
             fontSize: '1rem',
@@ -215,52 +225,62 @@ function Header(props) {
           <MenuItem value="na">{t("nah")}</MenuItem>
         </Select>
 
-      </Toolbar>
+        </Toolbar>
 
-      {isMobile ? (
-        <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
+
+        {isMobile ? (
+          <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Typography
             component="h2"
             variant="h3"
             color="inherit"
-            align="center"
+            align="left"
             noWrap
             sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif' }}
           >
             {title}
           </Typography>
-        </Toolbar>
-      ) : null}
 
-      <Toolbar
-        component="nav"
-        variant="dense"
-        sx={{ justifyContent: 'space-between', overflowX: 'auto', overflowY: 'hidden'}}
-      >
-        {sections.map((section) => (
-          <Grid container direction="column" alignItems="center" key={section.title}>
-          <img src={section.icon} style={{ width: '25%', marginBottom: '4px', marginTop:'6px' }} />
-          <NavLink to={section.url} style={{textDecoration:"none"}}>
-            <Link
-              noWrap
-              key={section.title}
-              variant="body2"
-              sx={{ 
-                p: 1, 
-                flexShrink: 0, 
-                fontFamily: 'Didact Gothic, sans-serif', 
-                fontSize: "1.25rem",
-                textDecoration: 'none', 
-                color: isSectionActive(section.url) ? 'primary.main' : 'black', // Cambia el color de la sección seleccionada
-                cursor: 'pointer',
-              }}
-            >
-              {section.title}
-            </Link>
-          </NavLink>
-          </Grid>
-        ))}
-      </Toolbar>
+          <IconButton edge="end" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
+            <MenuIcon />
+          </IconButton>
+
+          </Toolbar>
+
+        ) : null}
+
+
+      {/* Categorías (vista Desktop) */}
+      {!isMobile && (
+        <Toolbar component="nav" variant="dense" sx={{ justifyContent: 'space-between', overflowX: 'auto' }}>
+          {sections.map((section) => (
+            <NavLink to={section.url} key={section.title} style={{ textDecoration: 'none' }}>
+              <Grid container direction="column" alignItems="center">
+                <img src={section.icon} style={{ width: '25%', marginBottom: '4px', marginTop: '6px' }} />
+                <Link
+                  noWrap
+                  variant="body2"
+                  onClick={() => handleSectionClick(section.category)}
+                  sx={{
+                    p: 1,
+                    fontFamily: 'Didact Gothic, sans-serif',
+                    fontSize: '1.25rem',
+                    color: isSectionActive(section.category) ? 'primary.main' : 'black',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {section.title}
+                </Link>
+              </Grid>
+            </NavLink>
+          ))}
+        </Toolbar>
+      )}
+
+      {/* Drawer */}
+      <SwipeableDrawer anchor="top" open={drawerOpen} onClose={toggleDrawer(false)} onOpen={toggleDrawer(true)}>
+        {drawerList()}
+      </SwipeableDrawer>
     </React.Fragment>
   );
 }
