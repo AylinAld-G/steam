@@ -232,7 +232,7 @@ function Header(props) {
           <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Typography
             component="h2"
-            variant="h3"
+            variant="h4"
             color="inherit"
             align="left"
             noWrap
