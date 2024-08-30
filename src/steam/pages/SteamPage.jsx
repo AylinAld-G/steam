@@ -117,7 +117,7 @@ export const SteamPage = () => {
                 color="text.primary"
                 gutterBottom
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', fontSize: { xs: '2.5rem', md: '4rem',  }, marginLeft:{xs: "6%"}, 
-                '@media (max-width: 350px )': {
+                '@media (max-width: 414px )': {
                   marginLeft: '12%'
                 } }}
               >
@@ -140,7 +140,7 @@ export const SteamPage = () => {
                   justifyContent: "center",
                   gap: 1,
                   marginLeft:{xs: "10%"},
-                  '@media (max-width: 370px )': {
+                  '@media (max-width: 430px )': {
                     marginLeft: '15%'
                   }
                 }}
@@ -199,7 +199,7 @@ export const SteamPage = () => {
           </Box>
 
           {isSmallScreen ? (
-            <Box sx={{ maxWidth: 400, flexGrow: 1 }}>
+            <Box sx={{ maxWidth: 400, flexGrow: 1, mx: 'auto' }}> {/* mx: 'auto' centra horizontalmente el Box */}
               <Paper
                 square
                 elevation={0}
@@ -210,11 +210,24 @@ export const SteamPage = () => {
                   pl: 2,
                   bgcolor: 'background.default',
                 }}
+              />
+              <Box
+                sx={{
+                  height: 255,
+                  maxWidth: 400,
+                  width: '100%',
+                  p: 2,
+                  marginBottom: 10,
+                  display: 'flex',
+                  justifyContent: 'center', 
+                  alignItems: 'center',      
+                  mx: 'auto',
+                }}
               >
-
-              </Paper>
-              <Box sx={{ height: 255, maxWidth: 400, width: '100%', p: 2, marginBottom: 10}}>
-                <PersonCard post={{ ...cards[activeCard] , subtitle: t(cards[activeCard].subtitle)}} isFirstCard={activeCard === 0} />
+                <PersonCard
+                  post={{ ...cards[activeCard], subtitle: t(cards[activeCard].subtitle) }}
+                  isFirstCard={activeCard === 0}
+                />
               </Box>
               <MobileStepper
                 variant="dots"
@@ -237,7 +250,7 @@ export const SteamPage = () => {
             <Grid container spacing={4}>
               {cards.map((post, index) => (
                 <Grid item key={post.title} xs={12} sm={6} md={4}>
-                  <PersonCard post={{ ...post, subtitle: t(post.subtitle)}} isFirstCard={index === 0} />
+                  <PersonCard post={{ ...post, subtitle: t(post.subtitle) }} isFirstCard={index === 0} />
                 </Grid>
               ))}
             </Grid>
