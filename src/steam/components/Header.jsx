@@ -50,26 +50,48 @@ function Header(props) {
 
   React.useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
+
     if (storedLanguage) {
+      // Si hay un idioma guardado, se establece como idioma predeterminado
       setLang(storedLanguage);
       i18n.changeLanguage(storedLanguage);
     }
-    const handleResize = () => setIsMobile(window.innerWidth <= 690);
+  }, []); // Se ejecutará solo una vez al cargar el componente Header
+
+
+  const handleTrans = (code) => {
+    i18n.changeLanguage(code);
+    setLang(code);
+
+    // Guardar el idioma seleccionado en el localStorage
+    localStorage.setItem('language', code);
+  };
+
+  React.useEffect(() => {
+    // Detecta si la pantalla es de 690px o menos
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 690);
+    };
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [i18n]);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const drawerList = () => (
     <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
       <List>
         {sections.map((section, index) => (
+          <NavLink to={section.url} key={section.title} style={{ textDecoration: 'none', color:'black' }}>
           <ListItem button key={section.title} onClick={() => handleSectionClick(section.category)}>
             <ListItemIcon>
               <img src={section.icon} alt={section.title} style={{ width: '24px' }} />
             </ListItemIcon>
-            <ListItemText primary={section.title} />
+            <ListItemText primary={section.title} style={{fontFamily: 'Didact Gothic, sans-serif'}}/>
           </ListItem>
+          </NavLink>
         ))}
       </List>
     </Box>
@@ -182,7 +204,7 @@ function Header(props) {
           align="center"
           noWrap
           display={ isMobile ? "none" : "flow"}
-          sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif'}}
+          sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif', marginTop: '2px'}}
         >
           {title}
         </Typography>
@@ -236,7 +258,7 @@ function Header(props) {
             color="inherit"
             align="left"
             noWrap
-            sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif' }}
+            sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif', marginTop: '5px' }}
           >
             {title}
           </Typography>
@@ -259,13 +281,16 @@ function Header(props) {
                 <img src={section.icon} style={{ width: '25%', marginBottom: '4px', marginTop: '6px' }} />
                 <Link
                   noWrap
+                  key={section.title}
                   variant="body2"
                   onClick={() => handleSectionClick(section.category)}
-                  sx={{
-                    p: 1,
-                    fontFamily: 'Didact Gothic, sans-serif',
-                    fontSize: '1.25rem',
-                    color: isSectionActive(section.category) ? 'primary.main' : 'black',
+                  sx={{ 
+                    p: 1, 
+                    flexShrink: 0, 
+                    fontFamily: 'Didact Gothic, sans-serif', 
+                    fontSize: "1.25rem",
+                    textDecoration: 'none', 
+                    color: isSectionActive(section.category) ? 'primary.main' : 'black', // Cambia el color de la sección seleccionada
                     cursor: 'pointer',
                   }}
                 >
