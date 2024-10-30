@@ -157,7 +157,7 @@ useEffect(() => {
 
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link to="/auth/login">{t("loginLnk")}</Link>
+                <Link to="/users/auth/login">{t("loginLnk")}</Link>
               </Grid>
             </Grid>
           </Box>
