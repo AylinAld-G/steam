@@ -113,7 +113,7 @@ export default function LoginPage() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link to="/auth/new">{t("signUp")}</Link>
+                <Link to="/users/auth">{t("signUp")}</Link>
               </Grid>
             </Grid>
           </Box>
