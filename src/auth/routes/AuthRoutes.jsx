@@ -8,8 +8,8 @@ export const AuthRoutes = () => {
   return (
     <Routes>
         <Route path="login" element={<LoginPage/>}/>
-        <Route path="new" element={<SignUp/>}/>
-        <Route path='verification' element={<VerificationCode/>}/>
+        <Route path="" element={<SignUp/>}/>
+        <Route path=':uid/redeem-code' element={<VerificationCode/>}/>
 
     </Routes>
   )
