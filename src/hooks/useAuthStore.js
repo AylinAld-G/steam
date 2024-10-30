@@ -12,7 +12,7 @@ export const useAuthStore = () => {
 
     const startLogin = async({ username, password }) => {
         try {
-            const {data} = await steamApi.post('/auth/login', {username, password});
+            const {data} = await steamApi.post('/users/auth/login', {username, password});
             dispatch(onLogin({username: data.username, uid: data.uuid}))
             console.log(username)
 
@@ -28,7 +28,7 @@ export const useAuthStore = () => {
         dispatch(onRegister());
         try {
             
-            const {data} = await steamApi.post('/auth', { username, email, password});
+            const {data} = await steamApi.post('/users/auth', { username, email, password});
             //dispatch(onLogin({ username: data.username, uid: data.uuid}));
             console.log(username)
 
@@ -67,7 +67,7 @@ export const useAuthStore = () => {
 
     const deleteUser = async(uuid) => {
         try {
-            const {data} = await steamApi.delete(`users/delete/${uuid}`);
+            const {data} = await steamApi.delete(`/users/delete/${uuid}`);
             dispatch( onDeleteUser() );
             Swal.fire('Usuario eliminado', 'El usuario ha sido eliminado exitosamente', 'success');
 
@@ -93,7 +93,7 @@ export const useAuthStore = () => {
     
     const checkVerificationCode = async ({email, code}) => {
         try {
-            const {data} = await steamApi.post(`/${data.user_uuid}/redeem-code`, { code });
+            const {data} = await steamApi.post(`/users/${data.user_uuid}/redeem-code`, { code });
 
             if (data.isValid) {
                 console.log('Código válido');
