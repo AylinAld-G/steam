@@ -118,7 +118,7 @@ function Header(props) {
 
           </>
           :
-            <NavLink to="/auth/login">
+            <NavLink to="/users/auth/login">
               <Button variant="outlined" size="small" href='/auth/login'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
               </Button>
