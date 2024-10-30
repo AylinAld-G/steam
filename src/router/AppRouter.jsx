@@ -15,7 +15,7 @@ export const AppRouter = () => {
       {
         (status==='authenticated')
         ? <Route path="/*" element={<SteamRoutes/>}/>
-        : <Route path="/auth/*" element={<AuthRoutes/>}/>
+        : <Route path="/users/auth/*" element={<AuthRoutes/>}/>
       }
 
       <Route path='/*' element={<SteamRoutes/>}/>
