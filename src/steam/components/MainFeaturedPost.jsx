@@ -52,7 +52,7 @@ function MainFeaturedPost(props) {
               {post.description}
             </Typography>
 
-            <NavLink to="auth/new">
+            <NavLink to="/users/auth">
               <Button variant="contained" 
               sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"30px", fontSize: { xs: '0.875rem', md: '1rem' } }}
               >
