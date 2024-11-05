@@ -14,6 +14,7 @@ export const useAuthStore = () => {
         try {
             const {data} = await steamApi.post('/users/auth/login', {username, password});
             dispatch(onLogin({username: data.username, uid: data.uuid}))
+            navigate('/', { replace: true })
             console.log(username)
 
         } catch (error) {
@@ -27,14 +28,16 @@ export const useAuthStore = () => {
     const startRegister = async({username, email, password}) => {
         dispatch(onRegister());
         try {
-            
             const {data} = await steamApi.post('/users/auth', { username, email, password});
-            //dispatch(onLogin({ username: data.username, uid: data.uuid}));
-            console.log(username)
+
+            dispatch(onLogin({ username: data.username, uid: data.uuid}));
+            navigate(`/users/${data.uuid}/redeem-code`, { replace: true });
 
         } catch (error) {
             //dispatch( onLogout(error.response.data?.msg || '--'));
-            Swal.fire('Error', error.response.data.msg, 'error');
+            console.log('Error during registration ', error);
+            const errorMessage = error.response?.data?.msg || 'Registration failed';
+            Swal.fire('Error', errorMessage, 'error');
             dispatch( onLogout() );
             setTimeout(() => {
                 dispatch(clearErrorMessage());
@@ -91,13 +94,18 @@ export const useAuthStore = () => {
     }
 
     
-    const checkVerificationCode = async ({email, code}) => {
+   const checkVerificationCode = async ({uuid, code}) => {
+        if(!uuid){
+            console.error('UID is undefined')
+            return false;
+        }
         try {
-            const {data} = await steamApi.post(`/users/${data.user_uuid}/redeem-code`, { code });
+            const response = await steamApi.post(`/users/${uuid}/redeem-code`, { code });
 
-            if (data.isValid) {
-                console.log('Código válido');
-                dispatch(onLogin({ username: data.username, uid: data.uuid }));
+            if (response.status === 200) {
+                const userData = response.data;
+                dispatch(onLogin({ username: userData.username, uid: userData.uuid }));
+                navigate('/', { replace: true })
                 Swal.fire('Código válido', error.response.data.msg, 'success');
                 
               } else {
