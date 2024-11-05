@@ -59,8 +59,7 @@ export const VerificationCode = () => {
         } else {
           try {
             setLoading(true); // Mostrar LinearProgress al iniciar la verificación
-            await checkVerificationCode({ uid: uid, code: formValues.code });
-            navigate(`/users/${uid}/redeem-code`, { replace: true });
+            await checkVerificationCode({ uuid: uid, code: formValues.code });
             console.log(formValues.code);
           } finally {
             setLoading(false);
