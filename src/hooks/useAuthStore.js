@@ -1,19 +1,28 @@
 //Este hook tiene como objetivo realizar cualquier interacción con la parte del Auth en nuestro Store
 import { useDispatch, useSelector } from 'react-redux';
 import steamApi  from '../api/steamApi';
-import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onUpdateUser } from '../store/auth/authSlice';
+import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onSetRegistrationData, onUpdateUser } from '../store/auth/authSlice';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 
 export const useAuthStore = () => {
 
-    const { status,user, errorMessage } = useSelector( state => state.auth);
+    const { status,user, registrationData, errorMessage } = useSelector( state => state.auth);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
 
     const startLogin = async({ username, password }) => {
         try {
             const {data} = await steamApi.post('/users/auth/login', {username, password});
-            dispatch(onLogin({username: data.username, uid: data.uuid}))
+
+            if(registrationData){
+                dispatch(onLogin({username: username || registrationData.username, uid: data.uuid || registrationData.uid }))
+            }else{
+                dispatch(onLogin({username: username, uid: data.uuid, verified: data.verified ||true }))
+            }
+           
             navigate('/', { replace: true })
             console.log(username)
 
@@ -30,7 +39,7 @@ export const useAuthStore = () => {
         try {
             const {data} = await steamApi.post('/users/auth', { username, email, password});
 
-            dispatch(onLogin({ username: data.username, uid: data.uuid}));
+            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password}));
             navigate(`/users/${data.uuid}/redeem-code`, { replace: true });
 
         } catch (error) {
@@ -94,27 +103,27 @@ export const useAuthStore = () => {
     }
 
     
-   const checkVerificationCode = async ({uuid, code}) => {
+    const checkVerificationCode = async ({uuid, code}) => {
+
         if(!uuid){
             console.error('UID is undefined')
             return false;
         }
         try {
             const response = await steamApi.post(`/users/${uuid}/redeem-code`, { code });
+            //const userData = response.data;
 
-            if (response.status === 200) {
-                const userData = response.data;
-                dispatch(onLogin({ username: userData.username, uid: userData.uuid }));
-                navigate('/', { replace: true })
-                Swal.fire('Código válido', error.response.data.msg, 'success');
+            if (response.status === 200 ) {
+                dispatch(onLogin({ username: registrationData.username, uid: uuid, email: registrationData.email, password: registrationData.password, verified: true }));
+                navigate('/', { replace: true }) 
                 
-              } else {
-                console.log('Código no válido');
-                Swal.fire('Código no válido', error.response.data.msg, 'error');
-              }
+            } else {
+            console.log('Código no válido');
+            Swal.fire('Código no válido', error.response.data.msg, 'error');
+            }
 
         } catch (error) {
-          console.error(error.response.data.msg);
+          console.error(error.response || 'Error en la verificación');
         }
       };
 
