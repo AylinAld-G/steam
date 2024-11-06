@@ -8,11 +8,15 @@ export const authSlice = createSlice({
         errorMessage: undefined,
         users: [],
         verificationCode: '',
+        registrationData: null,
+        verified: false
     },
     reducers: {
         onLogin: (state, {payload}) => {
             state.status= 'authenticated';
             state.user = payload;
+            console.log(state.user);
+            state.verified = payload.verified;
             state.errorMessage = undefined;
         },
         onLogout: (state, {payload}) => {
@@ -22,8 +26,10 @@ export const authSlice = createSlice({
         },
         onRegister: (state) => {
           state.status = 'registering';
-          state.user = {};
           state.errorMessage = undefined;
+        },
+        onSetRegistrationData: (state, {payload}) =>{
+            state.registrationData = payload;
         },
         onGetUsers: (state, {payload}) => {
             state.status = 'authenticated';
@@ -46,4 +52,4 @@ export const authSlice = createSlice({
         },
     }
 });
-export const { onChecking, onLogin, onLogout, onRegister, onGetUsers, onDeleteUser, onUpdateUser, clearErrorMessage } = authSlice.actions;
+export const { onChecking, onLogin, onLogout, onRegister, onSetRegistrationData, onGetUsers, onDeleteUser, onUpdateUser, clearErrorMessage } = authSlice.actions;
