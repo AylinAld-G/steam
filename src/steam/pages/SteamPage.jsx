@@ -186,11 +186,11 @@ export const SteamPage = () => {
                 color="text.primary"
                 marginBottom='0px'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif',
-                '@media (max-width: 400px)': { // Estilos para pantallas pequeñas
-                  fontSize: '2.45rem', // Cambia el tamaño de fuente para pantallas pequeñas
+                '@media (max-width: 400px)': { 
+                  fontSize: '2.45rem', 
                 },
-                '@media (max-width: 290px)': { // Estilos para pantallas aún más pequeñas
-                  fontSize: '2.10rem', // Cambia el tamaño de fuente para pantallas muy pequeñas
+                '@media (max-width: 290px)': { 
+                  fontSize: '2.10rem', 
                 }, }}
             >
                 {t("contributors")}
