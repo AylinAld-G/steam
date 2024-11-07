@@ -43,6 +43,14 @@ function Carousel({ images, actual, handleGroupChange, autoPlay }) {
       onMouseLeave={() => {
         setAutoPlay(true);
       }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center", // Centrar horizontalmente
+        alignItems: "center",     // Centrar verticalmente
+        height: "100vh",          // Altura al 100% del viewport
+        maxWidth: "100%"
+      }}
     >
 
       <div className="carousel_wrapper">
