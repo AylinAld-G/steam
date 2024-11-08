@@ -12,7 +12,7 @@ steamApi.interceptors.request.use(config => {
 
     config.headers = {
         ...config.headers,
-        'access-token': Cookie.get('access_token')   //cualquier petición que haga con el steamApi adicionalmente le coloque este header 
+        'access_token': Cookies.get('access_token')  
     }
 
     return config;
