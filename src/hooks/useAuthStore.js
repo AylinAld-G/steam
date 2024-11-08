@@ -4,6 +4,9 @@ import steamApi  from '../api/steamApi';
 import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onSetRegistrationData, onUpdateUser } from '../store/auth/authSlice';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import Cookies from 'js-cookie';
+import {jwtDecode} from 'jwt-decode';
 
 
 export const useAuthStore = () => {
@@ -12,15 +15,47 @@ export const useAuthStore = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (storedUser) {
+            dispatch(onLogin(storedUser));
+        }
+    }, [dispatch]);
+
 
     const startLogin = async({ username, password }) => {
         try {
             const {data} = await steamApi.post('/users/auth/login', {username, password});
+            console.log(data)
+
+            const token = jwtDecode( data.access_token)
+            console.log(token)
+
+            if (data.access_token) {
+                Cookies.set('access_token', data.access_token);
+            } 
+
+            const rol_id = token.role
+            const roleName = await getRoleName(rol_id)
+
+            localStorage.setItem('user', JSON.stringify({
+                username: username || registrationData.username,
+                uid: data.uuid || registrationData.uuid,
+                verified: true,
+                role: rol_id,
+                role_name: roleName
+            }));
 
             if(registrationData){
-                dispatch(onLogin({username: username || registrationData.username, uid: data.uuid || registrationData.uid }))
+                dispatch(onLogin({
+                    username: username || registrationData.username, 
+                    uid: data.uuid || registrationData.uuid,
+                    verified: true,
+                    role: rol_id,
+                    role_name: roleName
+                 }))
             }else{
-                dispatch(onLogin({username: username, uid: data.uuid, verified: data.verified ||true }))
+                dispatch(onLogin({username: username, uid: data.uuid, verified: true, role: rol_id, role_name: roleName }))
             }
            
             navigate('/', { replace: true })
@@ -38,8 +73,22 @@ export const useAuthStore = () => {
         dispatch(onRegister());
         try {
             const {data} = await steamApi.post('/users/auth', { username, email, password});
+            console.log(data)
 
-            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password}));
+            Cookies.set('access_token', data)
+
+            const roleName = await getRoleName(data.role_id)
+
+            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password, verified: true, role: data.role_id, role_name: roleName}));
+
+            localStorage.setItem('user', JSON.stringify({
+                username: data.username,
+                uid: data.uuid,
+                verified: true,
+                role: data.role_id,
+                role_name: roleName
+            }));
+
             navigate(`/users/${data.uuid}/redeem-code`, { replace: true });
 
         } catch (error) {
@@ -72,7 +121,8 @@ export const useAuthStore = () => {
 
 
     const startLogout = () => {
-        localStorage.clear();
+        localStorage.removeItem('user');
+        Cookies.remove('access_token');
         dispatch( onLogout() );
     }
 
@@ -128,20 +178,38 @@ export const useAuthStore = () => {
       };
 
 
-      const getRoles = async () => {
-        try {
-          const response = await steamApi.get("/roles");
-          const roles = response.data.roles;
+    const getRoles = async () => {
+    try {
+        const response = await steamApi.get("/users/roles");
+        const roles = response.data.roles;
+        console.log(roles)
 
-          console.log("Roles:", roles);
-      
-          return roles;
-        } catch (error) {
+        const rolesData = roles.map(role => ({
+        id: role.role_id,
+        rol_name: role.role_name
+        }));
 
-          console.error("Error al obtener roles:", error);
-          throw error;
+        console.log('Roles: ', rolesData)
+        return rolesData;
+        
+    } catch (error) {
+
+        console.error("Error al obtener roles:", error);
+        throw error;
+    }
+    };
+
+    const getRoleName = async (roleId) => {
+        try{
+            const roles = await getRoles();
+
+            const role = roles.find(r => r.id === roleId);
+            return role ? role.rol_name : 'Unknown';
+        }catch(error){
+            console.error('Error al obtener nombre de rol', error);
+            return 'Unknown'
         }
-      };
+    }
 
 
 
@@ -154,6 +222,7 @@ export const useAuthStore = () => {
         //Métodos
         startLogin,
         startRegister,
+        getRoleName,
         getUsers,
         getRoles,
         deleteUser,
