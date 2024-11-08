@@ -127,7 +127,7 @@ function Header(props) {
         }
 
         {/*Menú del creator */}
-        { status=== 'authenticated' && user.rol_name==='Creator' ?(
+        { status=== 'authenticated' && user?.role_name==='Creator' ?(
           <>
             <Button
             id="fade-button"
@@ -162,7 +162,7 @@ function Header(props) {
         ): null}
 
 
-        {status=== 'authenticated' && user.rol_name==='Admin' ?(
+        {status=== 'authenticated' && user?.role_name==='Admin' ?(
           <>
             <Button
             id="fade-button"
