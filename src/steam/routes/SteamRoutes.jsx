@@ -18,18 +18,20 @@ import { UnauthorizedPage, NotFoundPage } from '../pages/errors/';
 
 export const SteamRoutes = () => {
 
-  const {getRoles} = useAuthStore();
+  const {getRoleName} = useAuthStore();
 
   const AdminRoute = ({ element }) => {
-    const roles = getRoles();
-    const isAdmin = Array.isArray(roles) && roles.includes('Admin');
+  const rol_id = localStorage.getItem(user.role_id)
+  const role_name = getRoleName(rol_id);
+  const isAdmin = role_name === 'Admin';
 
     return isAdmin ? element : <Navigate to="/unauthorized" replace />;
   };
 
   const CreatorRoute = ({ element }) => {
-    const roles = getRoles();
-    const isCreator = Array.isArray(roles) && roles.includes('Creator');
+    const rol_id = localStorage.getItem(user.role_id)
+    const role_name = getRoleName(rol_id);
+    const isCreator = role_name === 'Creator';
 
     return isCreator ? element : <Navigate to="/unauthorized" replace />;
   };
