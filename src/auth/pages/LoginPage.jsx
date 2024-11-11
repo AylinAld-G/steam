@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Avatar, Button, CssBaseline,TextField,Grid,Box,Typography,Container} from '@mui/material';
+import {Avatar, Button, CssBaseline,TextField,Grid,Box,Typography,Container, InputAdornment, IconButton} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect } from 'react';
@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import {Link} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useAuthStore, useForm } from '../../hooks';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 function Copyright(props) {
   return (
@@ -33,6 +34,16 @@ export default function LoginPage() {
   const { startLogin, errorMessage} = useAuthStore();
 
   const { loginName, loginPassword, onInputChange:onLoginInputChange } = useForm(loginFormFields);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
 
   const loginSubmit = (event) => {
     event.preventDefault();
@@ -92,12 +103,27 @@ export default function LoginPage() {
             />
             <TextField
               margin="normal"
+              id="outlined-adornment-password"
               required
               fullWidth
               name="loginPassword"
               label={t("psswd")}
-              type="password"
-              id="password"
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      onMouseUp={handleMouseUpPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
               value={loginPassword}
               onChange={onLoginInputChange}
               autoComplete="current-password"
