@@ -211,42 +211,53 @@ function Header(props) {
 
 
         {/*Menú de idioma */}
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          value={language}
-          onChange={(event) => handleTrans(event.target.value)}
-          autoWidth
-          IconComponent={LanguageIcon}
-          sx={{border:"none", fontFamily: 'Didact Gothic, sans-serif',
-          display: 'inline-flex',
-          marginBottom: 1,
-          marginTop: 1,
-          padding: 0,
-          '@media (max-width: 380px)': {
-            fontSize: '1rem',
-            padding: 0,
-            '&.MuiSelect-select.MuiSelect-select': { 
-              padding:0,
-              fontSize: '1rem',
-            }, 
-            '&.MuiMenu-list': { fontSize: '1rem'}
-          },
-          '@media (max-width: 355px)': {
-            fontSize: '15px',
-            '&.MuiSelect-select.MuiSelect-select': { 
-              fontSize: '15px',
-              padding:0 },
-            '&.MuiMenu-list': { fontSize: '15px'} 
-          },
+        <Box
+          sx={{
+            top: 0,
+            right: 0,
+            padding: '10px',
+            zIndex: 1000, 
+            '@media (max-width: 380px)': {
+              padding: '7px', // Ajuste opcional para pantallas más pequeñas
+            },
           }}
         >
-          <MenuItem value="es">
-            <em>{t("esp")}</em>
-          </MenuItem>
-          <MenuItem value="na">{t("nah")}</MenuItem>
-        </Select>
-
+          <Select
+            labelId="demo-simple-select-autowidth-label"
+            id="demo-simple-select-autowidth"
+            value={language}
+            onChange={(event) => handleTrans(event.target.value)}
+            autoWidth
+            IconComponent={LanguageIcon}
+            sx={{border:"none", fontFamily: 'Didact Gothic, sans-serif',
+            display: 'inline-flex',
+            marginBottom: 1,
+            marginTop: 1,
+            padding: 0,
+            '@media (max-width: 380px)': {
+              fontSize: '1rem',
+              padding: 0,
+              '&.MuiSelect-select.MuiSelect-select': { 
+                padding:0,
+                fontSize: '1rem',
+              }, 
+              '&.MuiMenu-list': { fontSize: '1rem'}
+            },
+            '@media (max-width: 355px)': {
+              fontSize: '15px',
+              '&.MuiSelect-select.MuiSelect-select': { 
+                fontSize: '15px',
+                padding:0 },
+              '&.MuiMenu-list': { fontSize: '15px'} 
+            },
+            }}
+            >
+            <MenuItem value="es">
+              <em>{t("esp")}</em>
+            </MenuItem>
+            <MenuItem value="na">{t("nah")}</MenuItem>
+            </Select>
+          </Box>
         </Toolbar>
 
 
