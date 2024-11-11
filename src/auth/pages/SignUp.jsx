@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Avatar,Button,CssBaseline,TextField,Grid,Box,Typography,Container, OutlinedInput, InputLabel, InputAdornment, IconButton} from '@mui/material';
+import {Avatar,Button,CssBaseline,TextField,Grid,Box,Typography,Container, InputAdornment, IconButton} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -43,6 +43,10 @@ export default function SignUp() {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
 
@@ -116,30 +120,32 @@ useEffect(() => {
               </Grid>
 
               <Grid item xs={12}>
-                <InputLabel htmlFor="outlined-adornment-password"></InputLabel>
-                  <OutlinedInput
-                    required
-                    id='password'
-                    label={t("psswd")}
-                    type={showPassword ? 'text' : 'password'}
-                    endAdornment={
+                <TextField
+                  required
+                  id='password'
+                  label={t("psswd")}
+                  type={showPassword ? 'text' : 'password'}
+                  InputProps={{
+                    endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
                           onClick={handleClickShowPassword}
                           onMouseDown={handleMouseDownPassword}
+                          onMouseUp={handleMouseUpPassword}
                           edge="end"
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
-                    }
-                    value={registerPassword}
-                    name='registerPassword'
-                    fullWidth
-                    autoComplete='new-password'
-                    onChange={onRegisterInputChange}
-                  />
+                    )
+                  }}
+                  value={registerPassword}
+                  name='registerPassword'
+                  fullWidth
+                  autoComplete='new-password'
+                  onChange={onRegisterInputChange}
+                />
               </Grid>
 
 
