@@ -167,13 +167,12 @@ export const useAuthStore = () => {
                 dispatch(onLogin({ username: registrationData.username, uid: uuid, email: registrationData.email, password: registrationData.password, verified: true }));
                 navigate('/', { replace: true }) 
                 
-            } else {
-            console.log('Código no válido');
-            Swal.fire('Código no válido', error.response.data.msg, 'error');
             }
 
         } catch (error) {
-          console.error(error.response || 'Error en la verificación');
+            const errorMessage = error.response?.data?.msg || 'Error en la verificación'
+            console.error(errorMessage);
+            Swal.fire('Código no válido', errorMessage, 'error');
         }
       };
 
