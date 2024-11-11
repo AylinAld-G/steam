@@ -196,7 +196,7 @@ export default function AdminDashboard() {
   };
 
   const handleUserAdd = () => {
-    <NavLink to={'/auth/new'}></NavLink>
+    <NavLink to={'/users/auth'}></NavLink>
   }
 
   const handleRowHover = (uuid) => {
