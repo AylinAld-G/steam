@@ -181,15 +181,9 @@ export const useAuthStore = () => {
     try {
         const response = await steamApi.get("/users/roles");
         const roles = response.data.roles;
-        console.log(roles)
 
-        const rolesData = roles.map(role => ({
-        id: role.role_id,
-        rol_name: role.role_name
-        }));
-
-        console.log('Roles: ', rolesData)
-        return rolesData;
+        console.log('Roles: ', roles)
+        return roles;
         
     } catch (error) {
 
@@ -200,10 +194,9 @@ export const useAuthStore = () => {
 
     const getRoleName = async (roleId) => {
         try{
-            const roles = await getRoles();
-
-            const role = roles.find(r => r.id === roleId);
-            return role ? role.rol_name : 'Unknown';
+            const response = await steamApi.get(`/users/roles/get-role`);
+            const {user_role} = response.data;
+            return user_role || 'Unknown';
         }catch(error){
             console.error('Error al obtener nombre de rol', error);
             return 'Unknown'
