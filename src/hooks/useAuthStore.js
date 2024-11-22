@@ -190,8 +190,8 @@ export const useAuthStore = () => {
     };
 
     const getRoleName = async () => {
+        
         try{
-
             const response = await steamApi.get(`/users/roles/get-role`);
             console.log(response)
             const {user_role} = response.data;
