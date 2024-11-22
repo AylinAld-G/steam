@@ -14,6 +14,7 @@ export const useAuthStore = () => {
     const { status,user, registrationData, errorMessage } = useSelector( state => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -32,11 +33,11 @@ export const useAuthStore = () => {
             console.log(token)
 
             if (data.access_token) {
-                Cookies.set('access_token', data.access_token);
+                Cookies.set('access_token', data.access_token, { path: '/', secure: false, sameSite: 'Lax'});
             } 
 
             const rol_id = token.role
-            const roleName = await getRoleName(rol_id)
+            const roleName = await getRoleName()
 
             localStorage.setItem('user', JSON.stringify({
                 username: username || registrationData.username,
@@ -75,18 +76,14 @@ export const useAuthStore = () => {
             const {data} = await steamApi.post('/users/auth', { username, email, password});
             console.log(data)
 
-            Cookies.set('access_token', data)
 
-            const roleName = await getRoleName(data.role_id)
-
-            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password, verified: true, role: data.role_id, role_name: roleName}));
+            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password, verified: true, role: data.role_id}));
 
             localStorage.setItem('user', JSON.stringify({
                 username: data.username,
                 uid: data.uuid,
                 verified: true,
                 role: data.role_id,
-                role_name: roleName
             }));
 
             navigate(`/users/${data.uuid}/redeem-code`, { replace: true });
@@ -192,11 +189,15 @@ export const useAuthStore = () => {
     }
     };
 
-    const getRoleName = async (roleId) => {
+    const getRoleName = async () => {
         try{
+
             const response = await steamApi.get(`/users/roles/get-role`);
+            console.log(response)
             const {user_role} = response.data;
-            return user_role || 'Unknown';
+
+            return user_role ? user_role : 'Unknown';
+
         }catch(error){
             console.error('Error al obtener nombre de rol', error);
             return 'Unknown'
