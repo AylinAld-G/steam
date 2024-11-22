@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, IconButton} from '@mui/material';
+import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade, Box, List, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, IconButton, CircularProgress} from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import LanguageIcon from '@mui/icons-material/Language';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,25 +20,50 @@ function Header(props) {
   const [language, setLang] = React.useState('es');
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const location = useLocation();
-  const [activeCategory, setActiveCategory] = useState('defaultCategory');
+  const [activeCategory, setActiveCategory] = useState(() =>{
+    return localStorage.getItem('activeCategory') || 'defaultCategory';
+  });
   const [isMobile, setIsMobile] = React.useState(false);
   const {status, startLogout, user} = useAuthStore();
   const { t, i18n } = useTranslation();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
+  const handleLogout = async () =>{
+    setLoading(true);
+    await startLogout();
+    setLoading(false);
+  }
+
+
+  React.useEffect(() => {
+    if (!location.pathname.includes('/publications')) {
+      localStorage.removeItem('activeCategory');
+      setActiveCategory('defaultCategory');
+    }
+  }, [location.pathname]);
+
   // Función para detectar si una sección está resaltada
-  const isSectionActive = (sectionCategory) => {
-    return activeCategory === sectionCategory;
+  const isSectionActive = (category) => {
+    return activeCategory === category;
   };
 
 
-  const handleSectionClick = (sectionCategory) => {
-    setActiveCategory(sectionCategory);
-    localStorage.setItem('activeCategory', sectionCategory);
+  const handleSectionClick = (category) => {
+    setActiveCategory(category);
+    localStorage.setItem('activeCategory', category);
+  };
+  
+  const handleTrans = (code) => {
+    i18n.changeLanguage(code);
+    setLang(code);
+
+    // Guardar el idioma seleccionado en el localStorage
+    localStorage.setItem('language', code);
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -50,47 +75,37 @@ function Header(props) {
 
   React.useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
-
     if (storedLanguage) {
-      // Si hay un idioma guardado, se establece como idioma predeterminado
       setLang(storedLanguage);
       i18n.changeLanguage(storedLanguage);
     }
-  }, []); // Se ejecutará solo una vez al cargar el componente Header
-
-
-  const handleTrans = (code) => {
-    i18n.changeLanguage(code);
-    setLang(code);
-
-    // Guardar el idioma seleccionado en el localStorage
-    localStorage.setItem('language', code);
-  };
-
-  React.useEffect(() => {
-    // Detecta si la pantalla es de 690px o menos
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 690);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 690);
     handleResize();
     window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [i18n]);
 
   const drawerList = () => (
     <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
       <List>
         {sections.map((section, index) => (
-          <NavLink to={section.url} key={section.title} style={{ textDecoration: 'none', color:'black' }}>
-          <ListItem button key={section.title} onClick={() => handleSectionClick(section.category)}>
-            <ListItemIcon>
-              <img src={section.icon} alt={section.title} style={{ width: '24px' }} />
-            </ListItemIcon>
-            <ListItemText primary={section.title} style={{fontFamily: 'Didact Gothic, sans-serif'}}/>
-          </ListItem>
+          <NavLink to={section.url} key={section.title} style={{ textDecoration: 'none'}}>
+            <ListItemButton key={section.title} 
+            onClick={() => handleSectionClick(section.category)}
+            sx={{
+              p: 1,
+              fontSize: '1.25rem',
+              color: isSectionActive(section.category) ? 'blue' : 'black',
+              fontWeight: isSectionActive(section.category) ? 'bold' : 'normal',
+              cursor: 'pointer',
+              transition: 'color 0.3s ease',
+            }}
+            >
+              <ListItemIcon>
+                <img src={section.icon} alt={section.title} style={{ width: '24px' }} />
+              </ListItemIcon>
+              <ListItemText primary={section.title} />
+            </ListItemButton>
           </NavLink>
         ))}
       </List>
@@ -102,7 +117,7 @@ function Header(props) {
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
   
       {
-          (status==='authenticated')
+          (status==='authenticated' && user.verified)
           
           ? <>
           <Typography variant='h5' component="h6" sx={{ fontFamily: 'Didact Gothic, sans-serif', marginRight:'10px' }}>
@@ -110,16 +125,36 @@ function Header(props) {
           </Typography>
 
             
+
           <NavLink to="/">
-            <Button variant="outlined" size="small" onClick={startLogout} sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px" }}>
+            <Button variant="outlined" size="small" onClick={handleLogout} sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px" }}>
               {t("logout")}
             </Button>
           </NavLink>
 
+          {loading && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                zIndex: 9999,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+
           </>
           :
             <NavLink to="/users/auth/login">
-              <Button variant="outlined" size="small" href='/auth/login'
+              <Button variant="outlined" size="small" href='/users/auth/login'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
               </Button>
             </NavLink>
@@ -127,7 +162,7 @@ function Header(props) {
         }
 
         {/*Menú del creator */}
-        { status=== 'authenticated' && user?.role_name==='Creator' ?(
+        { status=== 'authenticated' && user?.user_role==='Creator' ?(
           <>
             <Button
             id="fade-button"
@@ -162,7 +197,7 @@ function Header(props) {
         ): null}
 
 
-        {status=== 'authenticated' && user?.role_name==='Admin' ?(
+        {status=== 'authenticated' && user?.user_role==='Admin' ?(
           <>
             <Button
             id="fade-button"
@@ -204,7 +239,7 @@ function Header(props) {
           align="center"
           noWrap
           display={ isMobile ? "none" : "flow"}
-          sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif', marginTop: '2px'}}
+          sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif'}}
         >
           {title}
         </Typography>
@@ -251,13 +286,14 @@ function Header(props) {
               '&.MuiMenu-list': { fontSize: '15px'} 
             },
             }}
-            >
+          >
             <MenuItem value="es">
               <em>{t("esp")}</em>
             </MenuItem>
             <MenuItem value="na">{t("nah")}</MenuItem>
-            </Select>
-          </Box>
+          </Select>
+        </Box>
+
         </Toolbar>
 
 
@@ -265,11 +301,11 @@ function Header(props) {
           <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Typography
             component="h2"
-            variant="h4"
+            variant="h3"
             color="inherit"
             align="left"
             noWrap
-            sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif', marginTop: '5px' }}
+            sx={{ flex: 1, fontFamily: 'Comfortaa, sans-serif' }}
           >
             {title}
           </Typography>
@@ -292,17 +328,16 @@ function Header(props) {
                 <img src={section.icon} style={{ width: '25%', marginBottom: '4px', marginTop: '6px' }} />
                 <Link
                   noWrap
-                  key={section.title}
                   variant="body2"
                   onClick={() => handleSectionClick(section.category)}
-                  sx={{ 
-                    p: 1, 
-                    flexShrink: 0, 
-                    fontFamily: 'Didact Gothic, sans-serif', 
-                    fontSize: "1.25rem",
-                    textDecoration: 'none', 
-                    color: isSectionActive(section.category) ? 'primary.main' : 'black', // Cambia el color de la sección seleccionada
+                  sx={{
+                    p: 1,
+                    fontFamily: 'Didact Gothic, sans-serif',
+                    fontSize: '1.25rem',
+                    color: isSectionActive(section.category) ? 'blue' : 'black',
+                    fontWeight: isSectionActive(section.category) ? 'bold' : 'normal',
                     cursor: 'pointer',
+                    transition: 'color 0.3s ease',
                   }}
                 >
                   {section.title}
@@ -326,6 +361,7 @@ Header.propTypes = {
     PropTypes.shape({
       title: PropTypes.string.isRequired,
       url: PropTypes.string,
+      category: PropTypes.string
     }),
   ).isRequired,
   title: PropTypes.string.isRequired,
