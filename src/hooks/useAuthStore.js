@@ -192,11 +192,12 @@ export const useAuthStore = () => {
     const getRoleName = async () => {
         
         try{
-            const response = await steamApi.get(`/users/roles/get-role`);
+            const accessToken = Cookies.get('access_token');
+            const response = await steamApi.get('/users/roles/get-role', {withCredentials: true, headers: {Authorization: `${accessToken}`}},);
             console.log(response)
             const {user_role} = response.data;
 
-            return user_role ? user_role : 'Unknown';
+            return user_role || 'Unknown';
 
         }catch(error){
             console.error('Error al obtener nombre de rol', error);
