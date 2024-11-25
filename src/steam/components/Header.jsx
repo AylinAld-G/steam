@@ -15,23 +15,6 @@ const lngs = [
   { code: "na", native: "Náhuatl" },
 ];
 
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade, Box, List, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, IconButton, CircularProgress} from '@mui/material';
-import { NavLink } from 'react-router-dom';
-import LanguageIcon from '@mui/icons-material/Language';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useAuthStore } from '../../hooks';
-import { useTranslation } from "react-i18next";
-import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useState } from 'react';
-
-const lngs = [
-  { code: "es", native: "Spanish" },
-  { code: "na", native: "Náhuatl" },
-];
-
 function Header(props) {
   const { sections, title, category } = props;
   const [language, setLang] = React.useState('es');
@@ -159,7 +142,7 @@ function Header(props) {
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
   
       {
-          status==='authenticated' && user.verified && isUserRole &&(
+          status==='authenticated' && user.verified && role === 'User' &&(
           
            <>
           <Typography variant='h5' component="h6" sx={{ fontFamily: 'Didact Gothic, sans-serif', marginRight:'10px' }}>
@@ -266,7 +249,7 @@ function Header(props) {
             onClick={handleClick}
             sx={{marginRight:'10px'}}
             >
-              {user.name}
+              {user.username}
             </Button>
             <Menu
               id="fade-menu"
