@@ -18,20 +18,23 @@ import { UnauthorizedPage, NotFoundPage } from '../pages/errors/';
 
 export const SteamRoutes = () => {
 
-  const {getRoleName} = useAuthStore();
-
   const AdminRoute = ({ element }) => {
-  const rol_id = localStorage.getItem(user.role_id)
-  const role_name = getRoleName(rol_id);
-  const isAdmin = role_name === 'Admin';
+
+    const user = localStorage.getItem('user')
+    const userObject = JSON.parse(user);
+    const rolName = userObject.role_name
+    const isAdmin = rolName === 'Admin';
 
     return isAdmin ? element : <Navigate to="/unauthorized" replace />;
   };
 
   const CreatorRoute = ({ element }) => {
-    const rol_id = localStorage.getItem(user.role_id)
-    const role_name = getRoleName(rol_id);
-    const isCreator = role_name === 'Creator';
+    const user = localStorage.getItem('user')
+    const userObject = JSON.parse(user);
+    const rolName = userObject.role_name
+    
+    const isCreator = rolName === 'Creator';
+
 
     return isCreator ? element : <Navigate to="/unauthorized" replace />;
   };
@@ -46,16 +49,19 @@ export const SteamRoutes = () => {
         <Route path='/science' element={<Science/>}/>
         <Route path='/engine' element={<Enginee/>}/>
 
-        <Route path=":category/publications/:id" element={<Article />} />
-        <Route path="publications/:id" element={<Article />} />
+        <Route path="/:category/publications/:id" element={<Article />} />
+        <Route path="/publications/:id" element={<Article />} />
+        <Route path="/publications" element={<PostsList />} />
 
         <Route path='/dashboard' element={<CreatorRoute element={<Articles/>}/>}/>
-        <Route path='publications/update/:id' element={<CreatorRoute element={<EditArticle/>}/>}/>
-        <Route path='publications/delete/:id' element={<CreatorRoute element={<DeleteDialog/>}/>}/>
-        <Route path='publications/add' element={<CreatorRoute element={<AddArticle/>}/>}/>
+        <Route path='/publications/update/:id' element={<CreatorRoute element={<EditArticle/>}/>}/>
+        <Route path='/publications/delete/:id' element={<CreatorRoute element={<DeleteDialog/>}/>}/>
+        <Route path='/publications/add' element={<CreatorRoute element={<AddArticle/>}/>}/>
+
 
         <Route path='/admin/dashboard' element={<AdminRoute element={<AdminDashboard />} />} />
         <Route path='/admin/updateUser/' element={<AdminRoute element={<UpdateUser/>} />} />
+
 
         <Route path='/unauthorized' element={<UnauthorizedPage/>}/>
         <Route path='/not-found' element={<NotFoundPage/>}/>
