@@ -26,25 +26,25 @@ export const useAuthStore = () => {
 
     const startLogin = async({ username, password }) => {
         try {
-            const {data} = await steamApi.post('/users/auth/login', {username, password});
+            const {data} = await steamApi.post('/users/auth/login', {username, password}, {withCredentials: true});
             console.log(data)
 
             const token = jwtDecode( data.access_token)
             console.log(token)
 
             if (data.access_token) {
-                Cookies.set('access_token', data.access_token, { path: '/', secure: false, sameSite: 'Lax'});
+                Cookies.set('access_token', data.access_token, {path:'/', secure: true, sameSite: 'none'});
             } 
 
             const rol_id = token.role
-            const roleName = await getRoleName()
+            const rolName = await getRoleName()
 
             localStorage.setItem('user', JSON.stringify({
                 username: username || registrationData.username,
                 uid: data.uuid || registrationData.uuid,
                 verified: true,
                 role: rol_id,
-                role_name: roleName
+                role_name: rolName
             }));
 
             if(registrationData){
@@ -53,10 +53,10 @@ export const useAuthStore = () => {
                     uid: data.uuid || registrationData.uuid,
                     verified: true,
                     role: rol_id,
-                    role_name: roleName
+                    role_name: rolName
                  }))
             }else{
-                dispatch(onLogin({username: username, uid: data.uuid, verified: true, role: rol_id, role_name: roleName }))
+                dispatch(onLogin({username: username, uid: data.uuid, verified: true, role: rol_id, role_name: rolName}))
             }
            
             navigate('/', { replace: true })
