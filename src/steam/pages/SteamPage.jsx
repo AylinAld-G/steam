@@ -298,7 +298,7 @@ export const SteamPage = () => {
 
         <Box sx={{ '& > :not(style)': { m: 6 },}}>
           <ScrollToTop smooth color="#FFF" height='22px'
-            style={{borderRadius:"30px", width: "50px", height:"50px", backgroundColor:"#2979ff", padding:"5px", 
+            style={{borderRadius:"30px", width: "50px", height:"50px", backgroundColor:"#1976d2", padding:"5px", 
             bottom: '1px', right: '1px',}}/>
         </Box>
           
