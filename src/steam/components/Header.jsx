@@ -184,7 +184,7 @@ function Header(props) {
               <></>
             ) :(
             <NavLink to="/users/auth/login">
-              <Button variant="outlined" size="small" href='/users/auth/login'
+              <Button variant="contained" size="small" href='/users/auth/login'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
               </Button>
             </NavLink>
@@ -194,7 +194,7 @@ function Header(props) {
           {
             status === 'not-authenticated' && (
               <NavLink to="/users/auth/login">
-              <Button variant="outlined" size="small" href='/users/auth/login'
+              <Button variant="contained" size="small" href='/users/auth/login'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
               </Button>
             </NavLink>
@@ -212,7 +212,8 @@ function Header(props) {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
-            sx={{marginRight:'10px'}}
+            startIcon ={<Person/>}
+            sx={{marginRight:'10px', fontFamily: 'Didact Gothic, sans-serif'}}
             >
               {user.username}
             </Button>
@@ -247,7 +248,8 @@ function Header(props) {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
-            sx={{marginRight:'10px'}}
+            startIcon ={<Person/>}
+            sx={{marginRight:'10px', fontFamily: 'Didact Gothic, sans-serif',  borderRadius:"30px"}}
             >
               {user.username}
             </Button>
