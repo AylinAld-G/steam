@@ -15,6 +15,23 @@ const lngs = [
   { code: "na", native: "Náhuatl" },
 ];
 
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import {Toolbar, Button, Typography, Link, MenuItem, Select, Grid, Menu, Fade, Box, List, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, IconButton, CircularProgress} from '@mui/material';
+import { NavLink } from 'react-router-dom';
+import LanguageIcon from '@mui/icons-material/Language';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useAuthStore } from '../../hooks';
+import { useTranslation } from "react-i18next";
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useState } from 'react';
+
+const lngs = [
+  { code: "es", native: "Spanish" },
+  { code: "na", native: "Náhuatl" },
+];
+
 function Header(props) {
   const { sections, title, category } = props;
   const [language, setLang] = React.useState('es');
@@ -29,6 +46,10 @@ function Header(props) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
+  const [role, setRole] = useState(null)
+  const isUserRole = role === 'User';
+  const isCreatorRole = role === 'Creator';
+  const isAdminRole = role === 'Admin';
 
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -39,6 +60,27 @@ function Header(props) {
     setLoading(false);
   }
 
+  const getUserRol = async () => {
+    const user = localStorage.getItem('user')
+    if(user){
+      const userObject = JSON.parse(user);
+      const rolName = userObject.role_name
+
+     return rolName || null
+    }else{
+      console.error("No se encontró el objeto user")
+      return null;
+    }
+  } 
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const rol = await getUserRol();
+      setRole(rol)
+    }
+
+    fetchUserRole()
+  }, []);
 
   React.useEffect(() => {
     if (!location.pathname.includes('/publications')) {
@@ -117,9 +159,9 @@ function Header(props) {
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
   
       {
-          (status==='authenticated' && user.verified)
+          status==='authenticated' && user.verified && isUserRole &&(
           
-          ? <>
+           <>
           <Typography variant='h5' component="h6" sx={{ fontFamily: 'Didact Gothic, sans-serif', marginRight:'10px' }}>
               {user.username}
           </Typography>
@@ -152,17 +194,34 @@ function Header(props) {
           )}
 
           </>
-          :
+          ) }
+          
+           {
+            status === 'authenticated' || user ? (
+              <></>
+            ) :(
             <NavLink to="/users/auth/login">
               <Button variant="outlined" size="small" href='/users/auth/login'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
               </Button>
             </NavLink>
+            )
+          }
 
-        }
+          {
+            status === 'not-authenticated' && (
+              <NavLink to="/users/auth/login">
+              <Button variant="outlined" size="small" href='/users/auth/login'
+                sx={{ fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", padding:"8px", marginRight: isMobile ? '20px' : "auto", }}>{t("login")}
+              </Button>
+            </NavLink>
+            ) 
+          } 
+
+        
 
         {/*Menú del creator */}
-        { status=== 'authenticated' && user?.user_role==='Creator' ?(
+        { status=== 'authenticated' && isCreatorRole &&(
           <>
             <Button
             id="fade-button"
@@ -172,7 +231,7 @@ function Header(props) {
             onClick={handleClick}
             sx={{marginRight:'10px'}}
             >
-              {user.name}
+              {user.username}
             </Button>
             <Menu
               id="fade-menu"
@@ -194,10 +253,10 @@ function Header(props) {
             </Button>
           </NavLink>
           </>
-        ): null}
+        )}
 
 
-        {status=== 'authenticated' && user?.user_role==='Admin' ?(
+        {status=== 'authenticated' && isAdminRole &&(
           <>
             <Button
             id="fade-button"
@@ -229,7 +288,7 @@ function Header(props) {
             </Button>
           </NavLink> 
           </>
-        ): null}
+        )}
 
 
         <Typography
