@@ -12,5 +12,5 @@ yarn dev
 yarn add
     @mui/material, @mui/icons-material, @emotion/styled, @emotion/react, 
     @reduxjs/toolkit react-redux, axios, sweetalert2, prop-types, react-router-dom@6,
-    @emailjs/browser, react-i18next, react-scroll-to-top, js-cookies
+    @emailjs/browser, react-i18next, react-scroll-to-top, js-cookie, jwt-decode
 
