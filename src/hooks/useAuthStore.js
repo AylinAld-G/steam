@@ -102,7 +102,7 @@ export const useAuthStore = () => {
 
     const getUsers = async ({ searchStr, limit, offset }) => {
         try {  
-            const response = await steamApi.get('/users', { params: {
+            const response = await steamApi.get('/users/get-users', { data: {
                 search_str: searchStr,
                 limit: limit,
                 offset: offset,
