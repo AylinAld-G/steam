@@ -4,7 +4,7 @@ import steamApi  from '../api/steamApi';
 import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onSetRegistrationData, onUpdateUser } from '../store/auth/authSlice';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import {jwtDecode} from 'jwt-decode';
 
@@ -76,14 +76,19 @@ export const useAuthStore = () => {
             const {data} = await steamApi.post('/users/auth', { username, email, password});
             console.log(data)
 
+            const roles = await getRoles()
+            const role = roles.find(r => r.id === data.role_id);
+            const role_name = role ? role.name : 'Unknown';
 
-            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password, verified: true, role: data.role_id}));
+
+            dispatch(onSetRegistrationData({ username: data.username, uid: data.uuid, email: data.email, password: data.password, verified: true, role: data.role_id, role_name}));
 
             localStorage.setItem('user', JSON.stringify({
                 username: data.username,
                 uid: data.uuid,
                 verified: true,
                 role: data.role_id,
+                role_name
             }));
 
             navigate(`/users/${data.uuid}/redeem-code`, { replace: true });
@@ -102,17 +107,20 @@ export const useAuthStore = () => {
 
     const getUsers = async ({ searchStr, limit, offset }) => {
         try {  
-            const response = await steamApi.get('/users/get-users', { data: {
+            const accessToken = Cookies.get('access_token')
+            const data = {
                 search_str: searchStr,
                 limit: limit,
                 offset: offset,
-              }});
-            const users = response.data.users;
+            };
+            const response = await steamApi.post('/users/get-users', data, { headers: {Authorization: `${accessToken}`}});
+            const users = response.data;
             dispatch(onGetUsers(users));
+            return users
 
         } catch (error) {
             console.log(error);
-            Swal.fire('Error al obtener usuarios', error.response.data.msg, 'error');
+            Swal.fire('Error al obtener usuarios', error.msg, 'error');
         }
     }
 
@@ -126,7 +134,8 @@ export const useAuthStore = () => {
 
     const deleteUser = async(uuid) => {
         try {
-            const {data} = await steamApi.delete(`/users/delete/${uuid}`);
+            const accessToken = Cookies.get('access_token')
+            const {data} = await steamApi.delete(`/users/delete/${uuid}`, {headers: {Authorization: `${accessToken}`}});
             dispatch( onDeleteUser() );
             Swal.fire('Usuario eliminado', 'El usuario ha sido eliminado exitosamente', 'success');
 
@@ -139,7 +148,8 @@ export const useAuthStore = () => {
 
     const updateUser = async(uuid, userData) => {
         try {
-            const {data} = await steamApi.post(`/users/update/${uuid}`, userData);
+            const accessToken = Cookies.get('access_token')
+            const {data} = await steamApi.post(`/users/update/${uuid}`, userData, {headers: {Authorization: `${accessToken}`}});
             dispatch( onUpdateUser());
             Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado exitosamente', 'success');
 
@@ -175,19 +185,22 @@ export const useAuthStore = () => {
 
 
     const getRoles = async () => {
-    try {
-        const response = await steamApi.get("/users/roles");
-        const roles = response.data.roles;
+        try {
+            const {data} = await steamApi.get("/users/roles");
+            const rawRoles = data.items
+            const roles = rawRoles.map(role => {
+                const roleName = Object.keys(role)[0]; // El nombre del rol es la clave
+                const roleId = role[roleName];         // El role_id es el valor
+                return { name: roleName, id: roleId }; 
+            });
+            return roles;
+            
+        } catch (error) {
 
-        console.log('Roles: ', roles)
-        return roles;
-        
-    } catch (error) {
-
-        console.error("Error al obtener roles:", error);
-        throw error;
+            console.error("Error al obtener roles:", error);
+            throw error;
+        }
     }
-    };
 
     const getRoleName = async () => {
         
