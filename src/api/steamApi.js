@@ -1,19 +1,15 @@
 import axios from 'axios';
 import { getEnvVariables } from '../helpers/getEnvVariables';
-import Cookie from 'js.cookie';
+import Cookies from 'js-cookie';
 
 const { VITE_API_URL } = getEnvVariables();
 
+console.log('VITE_API_URL:', VITE_API_URL);
+
 const steamApi = axios.create({
-    baseURL: VITE_API_URL
+    baseURL: VITE_API_URL,
+    withCredentials: true
 });
 
-steamApi.interceptors.request.use((config) => {
-    const token = Cookies.get('access_token');
-    if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-});
 
 export default steamApi;
