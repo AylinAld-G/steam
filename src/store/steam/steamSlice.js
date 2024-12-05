@@ -16,53 +16,41 @@ export const steamSlice = createSlice({
         },
         onAddNewArticle: ( state, { payload }) => {
             state.publications.push( payload );
+            //state.activeArticle = null;
+        },
+        onUpdateArticle: (state, { payload }) => {
+            state.publications = state.publications.map((publication) => {
+              if (publication.id_publication === payload.id_publication) {
+                return payload; 
+              }
+              return publication;
+            });
+        },
+        onDeleteArticle: (state) => {
+            if (state.activeArticle) {
+                state.publications = state.publications.filter(
+                    publication => publication.id_publication !== state.activeArticle.id_publication);}
             state.activeArticle = null;
         },
-        onUpdateArticle: ( state, { payload } ) => {
-            state.publications = state.publications.map( publication => {
-                if ( publication.id === payload.id ) {
-                    return payload;
-                }
-
-                return publication;
-            });
-        },
-        onDeleteArticle: ( state ) => {
-            if ( state.activeArticle ) {
-                state.publications = state.publications.filter( publication => publication.id !== state.activeArticle.id );  
-                state.activeArticle = null;
-            }
-        },
-        onLoadArticles: ( state, {payload = []} ) => {
+        onLoadArticles: ( state, {payload} ) => {
             state.isLoadingArticles = false;
-            //state.publications = payload;
-            payload.forEach(publication => {
-                const exists = state.publications.some(dbArticle => dbArticle.id === publication.id );
-                if(!exists){
-                    state.publications.push( publication )
-                }
-            });
+            state.publications = payload;
         },
         onSetActiveComment: ( state, { payload }) => {
             state.activeComment = payload;
+            console.log(payload);
         },
-        onLoadComments: ( state, {payload = []} ) => {
+        onLoadComments: ( state, {payload} ) => {
             state.isLoadingComments = false;
-            //state.comments = payload;
-            payload.forEach(comment => {
-                const exists = state.comments.find(dbComment => dbComment.id === comment.id);
-                if(!exists){
-                    state.comments = [...state.comments, comment];
-                }
-            });
+            state.comments = payload;
         },
         onAddNewComment: ( state, { payload }) => {
             state.comments.push( payload );
-            state.activeComment = null;
+            //state.activeComment = null;
         },
         onUpdateComment: ( state, { payload } ) => {
             state.comments = state.comments.map( comment => {
-                if ( comment.id === payload.id ) {
+                if ( comment.id_comment === payload.id_comment ) {
                     return payload;
                 }
 
@@ -71,9 +59,9 @@ export const steamSlice = createSlice({
         },
         onDeleteComment: ( state ) => {
             if ( state.activeComment ) {
-                state.comments = state.comments.filter( comment => comment.id !== state.activeComment.id );  //voy a regresar todos los comentarios cuyo ID sea diferente al del comment activo
-                state.activeComment = null;
+                state.comments = state.comments.filter( comment => comment.comment_uuid !== state.activeComment.comment_uuid );  //voy a regresar todos los comentarios cuyo ID sea diferente al del comment activo
             }
+            state.activeComment = null;
         },
         
     }
