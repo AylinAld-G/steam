@@ -3,19 +3,10 @@ import { Typography, Grid, Container, ThemeProvider, createTheme, Paper, Box, Ca
 import {AddPhotoAlternate} from '@mui/icons-material';
 //import TextareaAutosize from '@mui/base/TextareaAutosize';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm, useSteamStore } from '../../hooks';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-
-const sections = [
-    { title: 'science', url: '/science', icon: '../../../public/images/scienceIcon.png' },
-    { title: 'tech', url: '/tech', icon: '../../../public/images/technoIcon.png'  },
-    { title: 'eng', url: '/engine', icon: '../../../public/images/engineIcon.png'  },
-    { title: 'art', url: '/art', icon: '../../../public/images/artIcon.jpg'  },
-    { title: 'math', url: '/math', icon: '../../../public/images/mathIcon.jpg'  }
-  ];
 
 const theme = createTheme();
 const ariaLabel = { 'aria-label': 'title' };
@@ -29,25 +20,25 @@ export const AddArticle = () => {
   const { startSavingArticle, errorMessage} = useSteamStore();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showEmptyFieldsAlert, setShowEmptyFieldsAlert] = useState(false);
+  const navigate = useNavigate();
 
 
   const [formValues, setFormValues] = useState({
-    title: " ",
-    image: " ",
-    content: " ",
-    id_author: " ",
-    category: " ",
+    title: "",
+    image: "",
+    content: "",
+    category: "",
 });
 
-const onInputChanged = ({target}) => {
-  setFormValues({
-    ...formValues,
-    [target.name]: target.value
-  });
-}
+const onInputChanged = ({ target }) => {
+  setFormValues((prevValues) => ({
+    ...prevValues,
+    [target.name]: target.value,
+  }));
+};
 
 
-  const postSubmit = (event) => {
+  const postSubmit = async(event) => {
     event.preventDefault();
     // Verifica si los campos están vacíos
     if (Object.values(formValues).some(value => !value.trim())) {
@@ -55,20 +46,38 @@ const onInputChanged = ({target}) => {
       return;
     }
 
-    /*startSavingArticle({ 
-      category: postCategory, 
-      title: postTitle,
-      content: postContent,
-      image: postImage
-    });*/
-    console.log(formValues)
-    setShowSuccessAlert(true);
+    try {
+      await startSavingArticle(formValues);
+      console.log(formValues)
+ 
+  
+      // Limpia los valores del formulario después de guardar
+      setFormValues({
+        title: "",
+        image: "",
+        currentImage: null,
+        content: "",
+        category: "",
+        id_author: "",
+      });
+
+      setShowSuccessAlert(true);
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 3000);
+
+  
+    } catch (error) {
+      console.error("Error al guardar el artículo:", error);
+      Swal.fire('Error al guardar', error.message || 'Inténtalo nuevamente', 'error');
+    }
     
   };
 
   useEffect(() => {
-    if(errorMessage !== undefined){
-      Swal.fire('Error al guardar', errorMessage, 'error' );
+    if (errorMessage) {
+      Swal.fire('Error al guardar', errorMessage, 'error');
     }
   
   }, [errorMessage])
@@ -93,7 +102,7 @@ const onInputChanged = ({target}) => {
           setCurrentImage(e.target.result);
           setFormValues({
             ...formValues,
-            image: e.target.result,
+            image: `data:${files[0].type};base64,${e.target.result.split(',')[1]}`
           });
         };
         reader.readAsDataURL(files[0]);
@@ -109,7 +118,7 @@ const onInputChanged = ({target}) => {
     <>
     <ThemeProvider theme={theme}>
         <Container maxWidth="lg">
-            <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, icon: section.icon }))}/>
+            
             <Grid>
                 <div>
                     <Container>
@@ -129,18 +138,18 @@ const onInputChanged = ({target}) => {
                                     Título
                                 </Typography>
                                 <Input fullWidth value={formValues.title}  name='title' inputProps={ariaLabel} onChange={onInputChanged}
-                                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "2rem"}} 
+                                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "2rem", marginBottom: '20px'}} 
                                 />
                                 <CardMedia
                                     component="img"
                                     id='image'
                                     height="350px"
                                     onChange={onInputChanged}
-                                    src={currentImage}   //formValues.image
+                                    src={formValues.image}   //formValues.image
                                     sx={{borderRadius:"4px", marginTop:"3%", marginBottom:"2%"}}
                                 />
                                 {/* Botón flotante para cambiar la imagen */}
-                                <Box sx={{textAlign:"right"}}>
+                                <Box sx={{textAlign:"right", marginBottom: '20px'}}>
                                     <Button
                                         variant="contained"
                                         color="primary"
@@ -152,10 +161,10 @@ const onInputChanged = ({target}) => {
                                 </Box>
 
                                 <Typography variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
-                                    Autor
+                                    Autor ID
                                 </Typography>
                                 <Input value={formValues.id_author}  name='id_author' inputProps={ariaLabel} onChange={onInputChanged}
-                                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "1.15rem", marginBottom: 3, width:'50%'}} 
+                                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "1.15rem", marginBottom: 3, width:'70%'}} 
                                 />
 
                                 <Typography component="h2" variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
@@ -168,7 +177,7 @@ const onInputChanged = ({target}) => {
                                   lineHeight: 1.5,
                                   padding: '12px',
                                   borderRadius: '4px 4px 0 4px', 
-                                  marginBottom: 4,
+                                  marginBottom: '10px',
                                   '&:focus':{
                                     outline: 0,
                                     borderColor: '#A9A9A9'
@@ -178,26 +187,26 @@ const onInputChanged = ({target}) => {
                                     Categoría
                                 </Typography>
                                 <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label"></InputLabel>
+                                    <InputLabel id="category-select-label"></InputLabel>
                                     <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"  //category
+                                        labelId="category-select-label"
+                                        id="category-select"  //category
                                         name='category'
                                         value={formValues.category}
-                                        label=" "
+                                        label=""
                                         sx={{fontFamily: 'Didact Gothic, sans-serif'}}
                                         onChange={onInputChanged}  //onPostInputChange
                                     >
-                                        <MenuItem value="Ciencia">Ciencia</MenuItem>
-                                        <MenuItem value="Tecnología">Tecnología</MenuItem>
-                                        <MenuItem value="Ingeniería">Ingeniería</MenuItem>
-                                        <MenuItem value="Arte">Arte</MenuItem>
-                                        <MenuItem value="Matemáticas">Matemáticas</MenuItem>
+                                        <MenuItem value="ciencia">ciencia</MenuItem>
+                                        <MenuItem value="tecnología">tecnología</MenuItem>
+                                        <MenuItem value="ingeniería">ingeniería</MenuItem>
+                                        <MenuItem value="arte">arte</MenuItem>
+                                        <MenuItem value="matemáticas">matemáticas</MenuItem>
                                     </Select>
                                 </FormControl>
 
 
-                                <Stack spacing={2} direction="row">
+                                <Stack spacing={2} direction="row" sx={{marginBottom: '20px'}}>
                                     <Button variant="contained" type='submit'
                                         sx={{fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", top: "15px", bottom: "15px"}}>
                                         Guardar
