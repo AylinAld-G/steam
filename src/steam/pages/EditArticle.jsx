@@ -1,59 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Typography, Grid, Container, ThemeProvider, createTheme, Paper, Box, CardMedia, Input, Button, Stack, Snackbar, Alert, FormControl, Select, MenuItem, InputLabel} from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Typography, Grid, Container, ThemeProvider, createTheme, Paper, Box, CardMedia, Input, Button, Stack, Snackbar, Alert, FormControl, Select, MenuItem, InputLabel, CircularProgress} from '@mui/material';
 import {AddPhotoAlternate} from '@mui/icons-material';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useSteamStore } from '../../hooks';
-
-const sections = [
-    { title: 'science', url: '/science', icon:'../../../public/images/scienceIcon.png' },
-    { title: 'tech', url: '/tech', icon:'../../../public/images/technoIcon.png' },
-    { title: 'eng', url: '/engine', icon:'../../../public/images/engineIcon.png' },
-    { title: 'art', url: '/art', icon:'../../../public/images/artIcon.jpg' },
-    { title: 'math', url: '/math', icon:'../../../public/images/mathIcon.jpg' }
-];
-
-const articles = [
-  {
-    index: 1,
-    title: 'Featured post',
-    author: 'Robert P.',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-    image: 'https://picsum.photos/600/100?random',
-    imageLabel: 'Image Text',
-  },
-  {
-    index: 2,
-    title: 'Post title',
-    author: 'Andrew G.',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-    image: 'https://picsum.photos/600/100?random',
-    imageLabel: 'Image Text',
-  },
-  {
-    index: 3,
-    title: 'Article',
-    author: 'Jamie D.',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-    image: 'https://picsum.photos/600/100?random',
-    imageLabel: 'Image Text',
-    },
-    {
-      index: 4,
-      title: 'New',
-      author: 'Theo J.',
-      description:
-        'This is a wider card with supporting text below as a natural lead-in to additional content.',
-      image: 'https://picsum.photos/600/100?random',
-      imageLabel: 'Image Text',
-    },
-];
+import { onLoadArticles, onSetActiveArticle } from '../../store/steam/steamSlice';
 
 
 
@@ -65,23 +19,13 @@ const AlertM = React.forwardRef(function AlertM(props, ref) {
 });
 
 export const EditArticle = () => {
-  const { index } = useParams();
-  const adjustedIndex = parseInt(index) - 1; // Ajusta el índice para comenzar desde 0
+  const { id } = useParams();
 
   const { t } = useTranslation();
 
-     //const { articles, activeArticle, startSavingArticle } = useSteamStore();
+    const { publications, startSavingArticle, startLoadingArticles, isLoadingArticles } = useSteamStore();
+    const navigate = useNavigate();
 
-    // Encuentrar artículo según el Index
-    const post = articles[parseInt(adjustedIndex)];
-
-
-    const [formValues, setFormValues] = useState({
-        title: post.title,
-        image: post.image,
-        content: post.description,
-        author: post.author,
-    });
 
     const onInputChanged = ({target}) => {
       setFormValues({
@@ -92,13 +36,51 @@ export const EditArticle = () => {
 
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [showEmptyFieldsAlert, setShowEmptyFieldsAlert] = useState(false);
+    
+    const [formValues, setFormValues] = useState({
+      title: '',
+      id_publication: '',
+      content: '',
+      category: '',
+      image: '',
+      id_author: ''
+    });
 
-    /*useEffect(() => {
-      if ( activeArticle !== null ) {
-          setFormValues({ ...activeEvent });
-      }    
-      
-    }, [ activeArticle ])*/
+    const handleCategoryChange = (event) => {
+      setFormValues({
+        ...formValues,
+        category: event.target.value
+      });
+    }
+
+
+    useEffect(()=>{
+      startLoadingArticles();
+    },[])
+
+    const post = publications.find((article) => article[0] === id);
+
+    useEffect(() => {
+
+      if (post) {
+        const imageData = post[5]; 
+        const prefixedImage = imageData.startsWith('data:image') 
+          ? imageData 
+          : `data:image/jpeg;base64,${imageData}`; 
+    
+        setFormValues({
+          title: post[4],
+          id_publication: post[0],
+          content: post[6],
+          category: post[2],
+          id_author: post[1],
+          image: prefixedImage, 
+        });
+    
+        setCurrentImage(prefixedImage); 
+      }
+    }, [post]);
+
 
   const [currentImage, setCurrentImage] = useState(); // Estado para la imagen actual
 
@@ -118,14 +100,13 @@ export const EditArticle = () => {
         setCurrentImage(e.target.result);
         setFormValues({
         ...formValues,
-        image: e.target.result,
+        image: `data:${files[0].type};base64,${e.target.result.split(',')[1]}`
       });
       };
       reader.readAsDataURL(files[0]);
     }
   };
 
-  const [category, setCategory] = useState();
 
 
     const onSubmit = async(event) => {
@@ -134,9 +115,21 @@ export const EditArticle = () => {
         setShowEmptyFieldsAlert(true);
         return;
       }
-        //startSavingArticle(formValues);
+        await startSavingArticle(formValues);
         console.log(formValues)
         setShowSuccessAlert(true);
+        
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 3000);
+    }
+
+    if (isLoadingArticles) {
+      return (
+        <Container maxWidth="lg">
+          <CircularProgress sx={{ display: 'block', margin: '0 auto' }} />
+        </Container>
+      );
     }
 
 
@@ -144,9 +137,8 @@ export const EditArticle = () => {
     <>
       <ThemeProvider theme={theme}>
       <Container maxWidth="lg">
-      <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, icon: section.icon }))}/>
+      {/*<Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, category: section.category, icon: section.icon }))}/>*/}
       <Grid>
-        <div key={post.index}>
         <Container>
             <form onSubmit={ onSubmit }>
             <Paper
@@ -157,20 +149,27 @@ export const EditArticle = () => {
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
-            backgroundImage: `url(${currentImage || post.image})`,}}
+            backgroundImage: `url(${currentImage})`,}}
             />
             <Box p={2}>
                 <Input fullWidth name="title" value={formValues.title} inputProps={ariaLabel} onChange={onInputChanged} sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "2rem"}} />
+                
+                <Typography variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif', marginTop: '30px', color: 'dark-gray'}}>
+                  ID publicación
+                </Typography>
+                <Input value={formValues.id_publication}  name='id_publication' inputProps={ariaLabel} onChange={onInputChanged}
+                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "1.15rem", marginBottom: 4, width:'70%', color: 'gray'}} 
+                />
+
                 <CardMedia
                     component="img"
                     onChange={onInputChanged}
-                    alt={post.imageLabel}
                     height="350px"
-                    src={currentImage || formValues.image}
-                    sx={{borderRadius:"4px", marginTop:"3%", marginBottom:"2%"}}
+                    src={currentImage}
+                    sx={{borderRadius:"4px", marginTop:"3%", marginBottom:"1%"}}
                 />
                 {/* Botón flotante para cambiar la imagen */}
-                <Box sx={{textAlign:"right"}}>
+                <Box sx={{textAlign:"right",  marginBottom: '20px'}}>
                     <Button
                         variant="contained"
                         color="primary"
@@ -181,16 +180,25 @@ export const EditArticle = () => {
                     </Button>
                 </Box>
 
-                <Input value={formValues.author}  name='author' inputProps={ariaLabel} onChange={onInputChanged}
-                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "1.15rem", marginTop: 3, marginBottom: 3, width:'50%', color:'text.secondary'}} 
+                
+                <Typography variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
+                  Autor ID
+                </Typography>
+                <Input value={formValues.id_author}  name='id_author' inputProps={ariaLabel} onChange={onInputChanged}
+                  sx={{fontFamily: 'Didact Gothic, sans-serif', fontSize: "1.15rem", marginBottom: 4, width:'70%'}} 
                 />
 
+
+                <Typography component="h2" variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif', marginTop: '20px' }}>
+                  Descripción
+                </Typography>
                 <TextareaAutosize defaultValue={formValues.content} name='content' onChange={onInputChanged} style={{fontFamily:"Didact Gothic, sans-serif", 
                 width: '100%',
                 fontSize: '1.15rem',
                 fontWeight: 400,
                 lineHeight: 1.5,
                 padding: '12px',
+                marginBottom: '20px',
                 borderRadius: '4px 4px 0 4px', 
                 '&:focus':{
                   outline: 0,
@@ -206,20 +214,20 @@ export const EditArticle = () => {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"  
                         name='category'
-                        value={category}   //formValues.category
+                        value={formValues.category}   //formValues.category
                         label=" "
                         sx={{fontFamily: 'Didact Gothic, sans-serif'}}
-                        onChange={(event) => setCategory(event.target.value)}  //onInputChanged
+                        onChange={handleCategoryChange}  //onInputChanged
                     >
-                        <MenuItem value="Ciencia">Ciencia</MenuItem>
-                        <MenuItem value="Tecnología">Tecnología</MenuItem>
-                        <MenuItem value="Ingeniería">Ingeniería</MenuItem>
-                        <MenuItem value="Arte">Arte</MenuItem>
-                        <MenuItem value="Matemáticas">Matemáticas</MenuItem>
+                        <MenuItem value="ciencia">ciencia</MenuItem>
+                        <MenuItem value="tecnología">tecnología</MenuItem>
+                        <MenuItem value="ingeniería">ingeniería</MenuItem>
+                        <MenuItem value="arte">arte</MenuItem>
+                        <MenuItem value="matemáticas">matemáticas</MenuItem>
                     </Select>
                 </FormControl>
                 
-                <Stack spacing={2} direction="row">
+                <Stack spacing={2} direction="row" sx={{marginTop: '15px', marginBottom: '20px'}}>
                 <Button variant="contained" type='submit'
                     sx={{fontFamily: 'Didact Gothic, sans-serif', borderRadius:"20px", top: "15px", bottom: "15px"}}>
                     Guardar
@@ -255,7 +263,6 @@ export const EditArticle = () => {
             )}
         </Container>
 
-        </div>
       </Grid>
       </Container>
       
