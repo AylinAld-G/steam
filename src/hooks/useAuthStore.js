@@ -1,7 +1,7 @@
 //Este hook tiene como objetivo realizar cualquier interacción con la parte del Auth en nuestro Store
 import { useDispatch, useSelector } from 'react-redux';
 import steamApi  from '../api/steamApi';
-import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onSetRegistrationData, onUpdateUser } from '../store/auth/authSlice';
+import { clearErrorMessage, onDeleteUser, onGetUsers, onLogin, onLogout, onRegister, onSetCurrentPage, onSetRegistrationData, onUpdateUser } from '../store/auth/authSlice';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
@@ -11,7 +11,7 @@ import {jwtDecode} from 'jwt-decode';
 
 export const useAuthStore = () => {
 
-    const { status,user, registrationData, errorMessage } = useSelector( state => state.auth);
+    const { status,user, registrationData, errorMessage, users } = useSelector( state => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
@@ -22,6 +22,10 @@ export const useAuthStore = () => {
             dispatch(onLogin(storedUser));
         }
     }, [dispatch]);
+
+    const setCurrentPage = useCallback( (currentPage ) => {
+        dispatch( onSetCurrentPage( currentPage ) )
+    },[dispatch])
 
 
     const startLogin = async({ username, password }) => {
@@ -105,17 +109,14 @@ export const useAuthStore = () => {
         }
     }
 
-    const getUsers = async ({ searchStr, limit, offset }) => {
+    const getUsers = async ({ searchStr = '', limit = 10, offset = 0 } ={}) => {
         try {  
             const accessToken = Cookies.get('access_token')
-            const data = {
-                search_str: searchStr,
-                limit: limit,
-                offset: offset,
-            };
+            const data = {search_str: searchStr,limit,offset,};
             const response = await steamApi.post('/users/get-users', data, { headers: {Authorization: `${accessToken}`}});
-            const users = response.data;
+            const users = response.data.users;
             dispatch(onGetUsers(users));
+            console.log(users)
             return users
 
         } catch (error) {
@@ -184,7 +185,7 @@ export const useAuthStore = () => {
       };
 
 
-    const getRoles = async () => {
+    const getRoles = useCallback(async () => {
         try {
             const {data} = await steamApi.get("/users/roles");
             const rawRoles = data.items
@@ -200,7 +201,7 @@ export const useAuthStore = () => {
             console.error("Error al obtener roles:", error);
             throw error;
         }
-    }
+    },[])
 
     const getRoleName = async () => {
         
@@ -235,6 +236,7 @@ export const useAuthStore = () => {
         deleteUser,
         updateUser,
         checkVerificationCode,
-        startLogout
+        startLogout,
+        setCurrentPage
     }
 }
