@@ -1,20 +1,27 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Typography, Grid, Card, CardActionArea, CardContent, CardMedia, Fab, Box, Tooltip} from '@mui/material';
+import {Typography, Grid, Card, CardActionArea, CardContent, CardMedia, Fab} from '@mui/material';
 import { Edit, Delete, Add} from '@mui/icons-material'
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { EditArticle } from '../pages/EditArticle';
+import { useSteamStore } from '../../hooks';
+import { onSetActiveArticle } from '../../store/steam/steamSlice';
+import { useDispatch } from 'react-redux';
+import { DeleteDialog } from '../views/DeleteDialog';
 
 
 function ArticleViewEd(props) {
-  const { post, id, category } = props;
+  const { post, id } = props;
 
   const {t} = useTranslation();
+  const {activeArticle} = useSteamStore();
+  const dispatch = useDispatch();
 
   const cardLinkStyle = {
     textDecoration: 'none', // Quitar subrayado
   };
+
 
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -33,11 +40,21 @@ function ArticleViewEd(props) {
     setIsEditVisible(!isEditVisible);
   };
 
-  const handleClickOpen = (event) => {
+  const handleDelete = (event, article) => {
     event.stopPropagation();
-  }
+    event.preventDefault(); 
+    dispatch(onSetActiveArticle(article))
+    console.log(article);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false); 
+  };
+
 
   const [isMobile, setIsMobile] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     // Detecta si la pantalla es de 600px o menos
@@ -70,16 +87,15 @@ function ArticleViewEd(props) {
                     <CardMedia
                     component="img"
                     sx={{ width: '100%', height: '26%', display: 'block' }}
-                    image={post.image}
-                    alt={post.imageLabel}
+                    image={post[5]}
                     />)
                 }
 
                 <Typography component="h2" variant="h5" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
-                {post.title}
+                {post[4]}
                 </Typography>
                 <Typography variant="subtitle1" paragraph sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
-                {post.description}
+                {post[6]}
                 </Typography>
                 <Typography variant="subtitle1" color="primary" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
                 {t("keepReading")}
@@ -90,8 +106,8 @@ function ArticleViewEd(props) {
                 <CardMedia
                 component="img"
                 sx={{ width: { xs: '100%', sm: '50%' }, display: { xs: 'none', sm: 'block' } }}
-                image={post.image}
-                alt={post.imageLabel}
+                image={post[5]}
+
                 />
             )}
             {/* Botones flotantes */}
@@ -100,38 +116,35 @@ function ArticleViewEd(props) {
                 <Fab color="rgba(255, 255, 255, 0.7)" size="small" aria-label="edit" 
                 style={{ marginRight: '10px' }}
                 onClick={(event) => handleEdit(event)}
-                href={`/publications/update/${index + 1}`}
+                href={`/publications/update/${id}`}
                 >
                 <Edit />
                 </Fab>
 
-                <Link to={`/publications/delete/${index + 1 }`} style={cardLinkStyle}>
-                    <Fab color="rgba(255, 255, 255, 0.7)" size="small" aria-label="delete"
-                    onClick={(event) => { event.stopPropagation(); handleClickOpen(event)}}>
-                        <Delete />
-                    </Fab>
-                </Link>
+
+                <Fab onClick={(event) => handleDelete(event, post)} color="rgba(255, 255, 255, 0.7)" size="small" aria-label="delete">
+                  <Delete />
+                </Fab>
+
             </div>
             )}
+
             </Card>
         </CardActionArea>
-        </div>)
+        </div>
+        )
     }
     </Grid>
+
+    {isDeleteDialogOpen && <DeleteDialog onClose={closeDeleteDialog} />}
     </>
   );
 }
 
 ArticleViewEd.propTypes = {
-  post: PropTypes.shape({
-    author: PropTypes.string,
-    description: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    imageLabel: PropTypes.string,
-    title: PropTypes.string.isRequired,
-  }).isRequired,
-  id: PropTypes.number.isRequired, // índice
-  category: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+post: PropTypes.array.isRequired
+  
 };
 
 export default ArticleViewEd;
