@@ -3,13 +3,14 @@ import { SteamPage } from '../pages';
 import {Article} from '../components/Article';
 import { EditArticle } from '../pages/EditArticle';
 import { Articles } from '../pages/Articles';
-import { DeleteDialog } from '../views/DeleteDialog';
 import { AddArticle } from '../pages/AddArticle';
 import AdminDashboard from '../pages/AdminDashboard';
 import { UpdateUser } from '../pages/UpdateUser';
 import { UnauthorizedPage, NotFoundPage } from '../pages/errors/';
 import { PostsList } from '../components/PostsList';
 import Comments from '../components/Comments';
+import { Users } from '../components/Users';
+
 
 
 export const SteamRoutes = () => {
@@ -39,7 +40,6 @@ export const SteamRoutes = () => {
     <Routes>
         <Route path="/" element={<SteamPage/>}/>
 
-        <Route path="/:category/publications/:id" element={<Article />} />
         <Route path="/publications/:id" element={<Article />} />
         <Route path="/publications" element={<PostsList />} />
 
@@ -49,8 +49,8 @@ export const SteamRoutes = () => {
 
         <Route path='/comments/:id' element={<Comments/>}/>
 
-        <Route path='/admin/dashboard' element={<AdminRoute element={<AdminDashboard />} />} />
-        <Route path='/admin/updateUser/' element={<AdminRoute element={<UpdateUser/>} />} />
+        <Route path='/users/update/:id' element={<AdminRoute element={<UpdateUser/>} />} />
+        <Route path='/admin/dashboard' element={<AdminRoute element={<Users />} />} />
 
 
         <Route path='/unauthorized' element={<UnauthorizedPage/>}/>
