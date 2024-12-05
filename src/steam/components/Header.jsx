@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { Person } from '@mui/icons-material';
 
 const lngs = [
   { code: "es", native: "Spanish" },
