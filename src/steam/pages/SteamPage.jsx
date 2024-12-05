@@ -101,7 +101,9 @@ export const SteamPage = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="STEAM" sections={sections.map(section => ({ title: t(section.title), url: section.url, category: section.category, icon: section.icon }))}/> {/* Font family: Comfortaa*/}
+        <Header title="STEAM" sections={
+          sections.map(section => ({ title: t(section.title), url: section.url, category: section.category, icon: section.icon }))
+          }/> {/* Font family: Comfortaa*/}
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
 
@@ -117,7 +119,7 @@ export const SteamPage = () => {
                 color="text.primary"
                 gutterBottom
                 sx={{ fontFamily: 'Didact Gothic, sans-serif', fontSize: { xs: '2.5rem', md: '4rem',  }, marginLeft:{xs: "6%"}, 
-                '@media (max-width: 414px )': {
+                '@media (max-width: 350px )': {
                   marginLeft: '12%'
                 } }}
               >
@@ -187,7 +189,7 @@ export const SteamPage = () => {
                 marginBottom='0px'
                 sx={{ fontFamily: 'Didact Gothic, sans-serif',
                 '@media (max-width: 400px)': { 
-                  fontSize: '2.45rem', 
+                  fontSize: '2.45rem',
                 },
                 '@media (max-width: 290px)': { 
                   fontSize: '2.10rem', 
@@ -199,7 +201,7 @@ export const SteamPage = () => {
           </Box>
 
           {isSmallScreen ? (
-            <Box sx={{ maxWidth: 400, flexGrow: 1, mx: 'auto' }}> {/* mx: 'auto' centra horizontalmente el Box */}
+            <Box sx={{ maxWidth: 400, flexGrow: 1, mx: 'auto' }}>
               <Paper
                 square
                 elevation={0}
@@ -210,24 +212,21 @@ export const SteamPage = () => {
                   pl: 2,
                   bgcolor: 'background.default',
                 }}
-              />
-              <Box
-                sx={{
-                  height: 255,
-                  maxWidth: 400,
-                  width: '100%',
-                  p: 2,
-                  marginBottom: 10,
-                  display: 'flex',
-                  justifyContent: 'center', 
-                  alignItems: 'center',      
-                  mx: 'auto',
-                }}
               >
-                <PersonCard
-                  post={{ ...cards[activeCard], subtitle: t(cards[activeCard].subtitle) }}
-                  isFirstCard={activeCard === 0}
-                />
+
+              </Paper>
+              <Box sx={{ 
+                height: 255, 
+                maxWidth: 400, 
+                width: '100%', 
+                p: 2, 
+                marginBottom: 10,
+                display: 'flex',
+                justifyContent: 'center', 
+                alignItems: 'center',      
+                mx: 'auto',
+                }}>
+                <PersonCard post={{ ...cards[activeCard] , subtitle: t(cards[activeCard].subtitle)}} isFirstCard={activeCard === 0} />
               </Box>
               <MobileStepper
                 variant="dots"
@@ -250,7 +249,7 @@ export const SteamPage = () => {
             <Grid container spacing={4}>
               {cards.map((post, index) => (
                 <Grid item key={post.title} xs={12} sm={6} md={4}>
-                  <PersonCard post={{ ...post, subtitle: t(post.subtitle) }} isFirstCard={index === 0} />
+                  <PersonCard post={{ ...post, subtitle: t(post.subtitle)}} isFirstCard={index === 0} />
                 </Grid>
               ))}
             </Grid>
