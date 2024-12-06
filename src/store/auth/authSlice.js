@@ -7,16 +7,13 @@ export const authSlice = createSlice({
         user: {},
         errorMessage: undefined,
         users: [],
-        verificationCode: '',
         registrationData: null,
-        verified: false
+        currentPage: 0,
     },
     reducers: {
         onLogin: (state, {payload}) => {
             state.status= 'authenticated';
             state.user = payload;
-            console.log(state.user);
-            state.verified = payload.verified;
             state.errorMessage = undefined;
         },
         onLogout: (state, {payload}) => {
@@ -34,16 +31,32 @@ export const authSlice = createSlice({
         onGetUsers: (state, {payload}) => {
             state.status = 'authenticated';
             state.users = payload;
+            console.log(payload)
             state.errorMessage = undefined;
         },
+        onSetCurrentPage: (state, { payload }) => {
+            state.currentPage = payload; 
+        },
         onDeleteUser: (state, {payload}) => {
-            state.users = state.users.filter(user => user.user_uuid !== payload.user_uuid);
+            state.users = state.users.filter(user => user.user_uuid !== payload);
             state.errorMessage = undefined;
         },
         onUpdateUser: (state, {payload}) => {
-            const updatedUserIndex = state.users.findIndex(user => user.user_uuid === payload.user_uuid);
+            const updatedUserIndex = state.users.findIndex(user => user.uid === payload.uid);
             if (updatedUserIndex !== -1) {
                 state.users[updatedUserIndex] = payload.updatedUser;
+            }
+            state.errorMessage = undefined;
+        },
+        onForceVerification: (state, {payload})=>{
+            state.user = { ...state.user, verified: true };
+            state.errorMessage = undefined;
+        },
+        onUpdatePassword: (state, {payload}) => {
+            state.user = { ...state.user, password: payload };
+            const userIndex = state.users.findIndex(user => user.uid === state.user.uid);
+            if (userIndex !== -1) {
+                state.users[userIndex] = { ...state.users[userIndex], password: payload };
             }
             state.errorMessage = undefined;
         },
@@ -52,4 +65,4 @@ export const authSlice = createSlice({
         },
     }
 });
-export const { onChecking, onLogin, onLogout, onRegister, onSetRegistrationData, onGetUsers, onDeleteUser, onUpdateUser, clearErrorMessage } = authSlice.actions;
+export const { onChecking, onLogin, onLogout, onRegister, onSetRegistrationData, onGetUsers, onSetCurrentPage, onForceVerification, onUpdatePassword, onDeleteUser, onUpdateUser, clearErrorMessage } = authSlice.actions;
