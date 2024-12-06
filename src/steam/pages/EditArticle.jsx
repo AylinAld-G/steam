@@ -10,7 +10,6 @@ import { useSteamStore } from '../../hooks';
 import { onLoadArticles, onSetActiveArticle } from '../../store/steam/steamSlice';
 
 
-
 const theme = createTheme();
 const ariaLabel = { 'aria-label': 'title' };
 
@@ -53,7 +52,7 @@ export const EditArticle = () => {
       });
     }
 
-
+    //Cargar publicaciones
     useEffect(()=>{
       startLoadingArticles();
     },[])
