@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Typography, Grid, Divider, Container, ThemeProvider, createTheme, Paper, Box, CardMedia, Stack, Button, CircularProgress} from '@mui/material';
+import { Typography, Grid, Divider, Container, ThemeProvider, createTheme, Paper, Box, CardMedia, Button, CircularProgress} from '@mui/material';
 import Header from './Header';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
-import { Link, Navigate, NavLink, useParams } from 'react-router-dom';
+import { Link, NavLink, useParams } from 'react-router-dom';
 import Comments from './Comments';
 import { useSteamStore } from '../../hooks';
 
