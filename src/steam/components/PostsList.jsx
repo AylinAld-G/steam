@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@emotion/react';
-import { Button, Container, CssBaseline, Grid, IconButton, MobileStepper, Typography, createTheme } from '@mui/material';
+import { Box, Button, Container, CssBaseline, Grid, IconButton, MobileStepper, Typography, createTheme } from '@mui/material';
 import { KeyboardArrowLeft, KeyboardArrowRight} from '@mui/icons-material'
 import React, { useEffect } from 'react'
 import Header from './Header';
@@ -10,12 +10,12 @@ import { useSteamStore } from '../../hooks';
 
 
 const sections = [
-    { title: 'science', url: '/science', icon: '../../../public/images/scienceIcon.png' },
-    { title: 'tech', url: '/tech', icon: '../../../public/images/technoIcon.png'  },
-    { title: 'eng', url: '/engine', icon: '../../../public/images/engineIcon.png'  },
-    { title: 'art', url: '/art', icon: '../../../public/images/artIcon.jpg'  },
-    { title: 'math', url: '/math', icon: '../../../public/images/mathIcon.jpg'  }
-  ];
+  { title: 'science', url: '/publications', category: 'ciencia', icon: '../../../public/images/scienceIcon.png' },
+  { title: 'tech', url: '/publications', category: 'tecnología', icon: '../../../public/images/technoIcon.png'  },
+  { title: 'eng', url: '/publications', category: 'ingeniería', icon: '../../../public/images/engineIcon.png'  },
+  { title: 'art', url: '/publications', category: 'arte', icon: '../../../public/images/artIcon.jpg'  },
+  { title: 'math', url: '/publications', category: 'matemáticas', icon: '../../../public/images/mathIcon.jpg'  }
+];
 
   const theme = createTheme();
 
@@ -24,11 +24,19 @@ export const PostsList = () => {
   const { t, i18n } = useTranslation();
   const [isMobile, setIsMobile] = React.useState(true);
 
-  const { publications, startLoadingArticles } = useSteamStore();   
+  const { publications, startLoadingArticles } = useSteamStore();  
+  const [activeCategory, setActiveCategory] = React.useState(null); 
 
    //Cargar desde DB
   useEffect(() => {
     startLoadingArticles();
+  }, []);
+
+  useEffect(() => {
+    const storedCategory = localStorage.getItem('activeCategory'); 
+    if (storedCategory) {
+      setActiveCategory(storedCategory);
+    }
   }, []);
 
 
@@ -56,12 +64,14 @@ export const PostsList = () => {
 
   const location = useLocation();
 
-  const activeSection = sections.find((section) => location.pathname.startsWith(section.url));
-  const category = activeSection ? activeSection.title : 'defaultCategory';
+  const filteredPublications = activeCategory
+  ? publications.filter(post => post[2] === activeCategory)
+  : publications;
+
 
 
   const [activeStep, setActiveStep] = React.useState(0);
-  const maxSteps = publications.length;  //publications
+  const maxSteps = filteredPublications.length;  //publications
   const itemsPerPage = 2;
 
   const handleNext = () => {
@@ -72,7 +82,7 @@ export const PostsList = () => {
     setActiveStep((prevActiveStep) => Math.max(prevActiveStep - itemsPerPage, 0));
   };
 
-  const visibleArticles = publications.slice(activeStep, activeStep + itemsPerPage);  //publications
+  const visibleArticles = filteredPublications.slice(activeStep, activeStep + itemsPerPage);  //publications
 
   const handleNextM = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -87,9 +97,9 @@ export const PostsList = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg">
-      <Header title="STEAM" sections={sections.map(
-        section => ({ title: t(section.title), url: section.url, icon: section.icon })
-      )}/>
+      <Header title="STEAM" sections={
+          sections.map(section => ({ title: t(section.title), url: section.url, category: section.category, icon: section.icon }))
+        }/>
         <Grid>
             <Typography
             component="h2"
@@ -103,41 +113,46 @@ export const PostsList = () => {
             </Typography>
         </Grid>
 
-        <Grid container sx={{display: isMobile ? "none" : "flex"}}>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <IconButton onClick={handleBack} disabled={activeStep === 0}>
-            <KeyboardArrowLeft />
-          </IconButton>
-        {visibleArticles.map((post) => (
-          <Grid item key={post.title} xs={12} sm={6} md={4}>
-            <div style={{ width: '100%', margin: '5px'}}>
-              <ArticleView key={post.title} post={post} index={publications.indexOf(post)} category={category}/>
-            </div>
-          </Grid>
-        ))}
-        <IconButton onClick={handleNext} disabled={activeStep + itemsPerPage >= maxSteps}>
-          <KeyboardArrowRight />
-        </IconButton>
-        </div>
-        </Grid>
-
 
         {isMobile ? (
-          <Grid container justifyContent="center" alignItems="center" sx={{marginTop:"1%"}}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <div style={{ width: '100%'}}>
-                <ArticleView key={visibleArticles[0].title} post={visibleArticles[0]} index={publications.indexOf(visibleArticles[0])} category={category}/>
-              </div>
-            </Grid>
-          </div>
+        <>
+          <Grid container justifyContent="center" alignItems="center" sx={{ marginTop: "1%" }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              {visibleArticles.length > 0 ? (
+                visibleArticles.map((post) => (
+                  <Grid item key={post[0]}  >
+                    <div style={{ width: '100%', margin: '5px' }}>
+                      <ArticleView id={post[0]} post={post} />
+                    </div>
+                  </Grid>
+                ))
+              ) : (
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 1,
+                    bgcolor: '#F8F8FF',
+                  }}
+                />
+              )}
+            </div>
+          </Grid>
 
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
           <MobileStepper
             variant="dots"
             steps={maxSteps}
             position="static"
             activeStep={activeStep}
-            sx={{ maxWidth: 400, flexGrow: 1 }}
+            sx={{ maxWidth: 400, flexGrow: 1, 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              margin: 'auto',
+              [theme.breakpoints.up('sm')]: {
+                maxWidth: 400, 
+              }, }}
             nextButton={
               <Button
                 size="small"
@@ -163,8 +178,34 @@ export const PostsList = () => {
               </Button>
             }
           />
-          </Grid>
-        ): null}
+          </Box>
+        </>
+      ) : (
+        <Grid container sx={{ display: isMobile ? "none" : "flex", justifyContent: "center", marginTop: "1%" }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <IconButton onClick={handleBack} disabled={activeStep === 0}>
+              <KeyboardArrowLeft />
+            </IconButton>
+            {visibleArticles.length > 0 ? (
+              visibleArticles.map((post) => (
+                <Grid item key={post[0]}>
+                  <div style={{ width: '100%', margin: '5px' }}>
+                    <ArticleView id={post[0]} post={post} />
+                  </div>
+                </Grid>
+              ))
+            ) : (
+              <Box sx={{ width: '100%', textAlign: 'center', py: 2 }}>
+                <Typography variant="h5">No hay artículos disponibles</Typography>
+              </Box>
+            )}
+
+            <IconButton onClick={handleNext} disabled={activeStep + itemsPerPage >= maxSteps}>
+              <KeyboardArrowRight />
+            </IconButton>
+          </div>
+        </Grid>
+  )}
       </Container>
     </ThemeProvider>
   )
