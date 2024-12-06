@@ -8,6 +8,7 @@ import { useForm, useSteamStore } from '../../hooks';
 import Footer from '../components/Footer';
 
 
+
 const theme = createTheme();
 const ariaLabel = { 'aria-label': 'title' };
 
@@ -22,12 +23,17 @@ export const AddArticle = () => {
   const [showEmptyFieldsAlert, setShowEmptyFieldsAlert] = useState(false);
   const navigate = useNavigate();
 
+  const authUser = localStorage.getItem('user')
+  const userObject = JSON.parse(authUser);
+  const idAuthor = userObject.uid
+
 
   const [formValues, setFormValues] = useState({
     title: "",
     image: "",
     content: "",
     category: "",
+    id_author: idAuthor
 });
 
 const onInputChanged = ({ target }) => {
@@ -58,7 +64,6 @@ const onInputChanged = ({ target }) => {
         currentImage: null,
         content: "",
         category: "",
-        id_author: "",
       });
 
       setShowSuccessAlert(true);
