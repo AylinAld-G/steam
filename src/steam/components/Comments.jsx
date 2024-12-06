@@ -83,18 +83,21 @@ function Comments(props) {
   const idAuthor = userObject.uid
 
 
+  //Inicializar valores del form para crear comentario
   const [formValues, setFormValues] = React.useState({
     content: '',
     id_author: idAuthor,
     id_publication: id
   })
 
+  //Inicializar valores del form para editar comentario
   const [formValuesUp, setFormValuesUp] = React.useState({
     content: '',
     id_author: idAuthor,
     id_publication: id
   })
 
+  //detectar cambios de entrada: update comment
   const onInputChangedUp = ({ target }) => {
     setFormValuesUp(prev => ({
       ...prev,
@@ -105,6 +108,7 @@ function Comments(props) {
   const [isLoading, setIsLoading] = useState(true);
 
 
+  //detectar cambios de entrada: add comment
   const onInputChanged = ({ target }) => {
     setFormValues(prev => ({
       ...prev,
@@ -112,6 +116,7 @@ function Comments(props) {
     }));
   };
 
+  //obtener nombre de rol del user autenticado desde ls
   const getUserRol = async () => {
     const user = localStorage.getItem('user')
     if(user){
@@ -135,6 +140,7 @@ function Comments(props) {
   }, []);
 
 
+  //cargar comentarios
   useEffect(() => {
     setIsLoading(true);
     startLoadingComments(id);
@@ -142,20 +148,20 @@ function Comments(props) {
     console.log(comments)
   }, []);
 
- // const comment = comments.find((comment) => comment[2] === id);
 
   const toggleDrawer = (newOpen) => async() => {
     setOpen(newOpen);
   };
 
-
+  //Alertas: campos vacíos creación y/o actualización exitosa
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showEmptyFieldsAlert, setShowEmptyFieldsAlert] = useState(false);
 
+  //modales para eliminar y editar comentario
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(false);
 
-
+//Enviar form: add comment
   const addComment = (event) => {
     event.preventDefault();
     if (Object.values(formValues).some(value => !value.trim())) {
@@ -177,12 +183,14 @@ function Comments(props) {
 
   }
 
+  //Seleccionar comentario a eliminar
   const handleDeleteCommentSelection = (event, comment) => {
     event.stopPropagation();
     setIsDeleteModalOpen(true);
     dispatch(onSetActiveComment(comment));
   }
 
+  //Confirmar eliminación de comentario seleccionado
   const confirmDeleteComment = () => {
     if (activeComment) {
       startDeletingComment(activeComment[0]).then(() => {
@@ -193,6 +201,7 @@ function Comments(props) {
     }
   };
 
+  //Seleccionar comentario a editar, abrir modal de edición, cargar la info del comentario activo
   const handleUpdateCommentSelection = (event, comment) => {
     event.stopPropagation();
     setIsUpdateModalOpen(true);
@@ -207,6 +216,7 @@ function Comments(props) {
     dispatch(onSetActiveComment(comment))
   }
 
+  //Confirmar actualización de comentario activo
   const confirmUpdateComment = () =>{
     if(activeComment){
       startSavingComment({...formValuesUp}).then(()=>{
@@ -217,10 +227,12 @@ function Comments(props) {
     }
   }
 
+  //cerrar modal de eliminar comentario
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
 
+  //cerrar modal de editar comentario
   const handleCloseUpdateModal = () =>{
     setIsUpdateModalOpen(false);
   }
@@ -262,9 +274,7 @@ function Comments(props) {
         </Button>
       </Box>
 
-      {/*Agregar el Swipeable Drawer solo para celulares*/}
-      {/*En compu y en tablet view dejar los comentarios en la misma pantalla que el artículo */}
-
+      {/*Swipeable Drawer para pantallas pequeñas*/}
       {isMobile ? (
       <SwipeableDrawer
         container={container}
@@ -303,6 +313,8 @@ function Comments(props) {
             <Box sx={{ width: '100%' }}>
                   <Stack spacing={2} marginBottom='30px' marginTop='30px'>
                     <Item>
+
+                      {/*Agregar comentario form */}
                       <form onSubmit={addComment}>
                         <Typography variant='h6' sx={{textAlign:'left', fontFamily:"Didact Gothic, sans-serif"}}>Agrega un nuevo comentario</Typography>
                         <TextareaAutosize value={formValues.content} name='content' readOnly={false}  onChange={onInputChanged}
@@ -362,7 +374,7 @@ function Comments(props) {
                       )}
 
 
-                      {/* Modal para editar*/}
+                      {/* Modal para editar comentario*/}
                         <Dialog
                           open={isUpdateModalOpen}
                           onClose={handleCloseUpdateModal}
@@ -428,7 +440,7 @@ function Comments(props) {
                         </Dialog>
 
                         
-                        {/* Modal para eliminar*/}
+                        {/* Modal para eliminar comentario*/}
                         <Dialog
                           open={isDeleteModalOpen}
                           onClose={handleCloseDeleteModal}
@@ -465,6 +477,7 @@ function Comments(props) {
       ) : (
         <Box sx={{ px: 2, pb: 2, height: '100%', overflow: 'auto' }}>
           <>
+          {/*Drawer para pantallas grandes */}
           <Drawer anchor="bottom" open={state.bottom} onClose={toggleDrawerDesk('bottom', false)}>
             <Box
               sx={{
@@ -477,6 +490,8 @@ function Comments(props) {
               role="presentation"
             >
               <Stack spacing={2} marginBottom="30px" marginTop="30px">
+
+                {/* Agregar comentario */}
                 <form onSubmit={addComment}>
                   <Typography variant="h6" sx={{ textAlign: 'left', fontFamily: 'Didact Gothic, sans-serif' }}>
                     Agrega un nuevo comentario
@@ -532,6 +547,7 @@ function Comments(props) {
                 >
                   {role  === 'Admin' && (
                     <Box sx={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '4px' }}>
+                      {/*Botones habilitados solo para rol Admin */}
                       <IconButton
                         aria-label="delete"
                         onClick={(event) => handleDeleteCommentSelection(event, comment)}
