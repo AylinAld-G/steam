@@ -4,7 +4,6 @@ import { Box, Button, Container, CssBaseline, Fab, Grid, IconButton, MobileStepp
 import { KeyboardArrowLeft, KeyboardArrowRight, Add} from '@mui/icons-material'
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
-import Header from '../components/Header';
 import { useAuthStore, useSteamStore } from '../../hooks';
 import ArticleViewEd from '../components/ArticleViewEd';
 import Footer from '../components/Footer';
@@ -16,7 +15,6 @@ import Footer from '../components/Footer';
     const { t } = useTranslation();
     const { publications, startLoadingArticles } = useSteamStore();
     const [authorId, setAuthorId] = useState(null);
-    console.log(publications)
     
     // Cargar artículos al montar el componente
     useEffect(() => {
@@ -78,9 +76,28 @@ import Footer from '../components/Footer';
           );
         }))
       : (
-            <Typography variant="h6" align="center" color="text.secondary">
+        <>
+            <Typography variant="h6" align="center" color="text.secondary" sx={{fontFamily: 'Didact Gothic, sans-serif',}}>
               Aun no hay artículos
             </Typography>
+
+          <Box sx={{ position: 'fixed', bottom: '60px', right: '98px',
+            '@media (max-width: 600px)': {
+              bottom: '10px', 
+              right: '10px',
+            }
+          }} >
+            <Tooltip title="Agregar artículo" placement="top">
+              <Link to={'/publications/add'} style={{textDecoration: "none"}}>
+                <Fab color="primary" aria-label="add">
+                  <Add />
+                </Fab>
+              </Link>
+            </Tooltip>
+          </Box>
+        </>
+
+
           )}
         {/*</Grid>*/}
 
