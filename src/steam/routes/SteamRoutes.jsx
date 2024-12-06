@@ -49,7 +49,6 @@ export const SteamRoutes = () => {
 
         <Route path='/comments/:id' element={<Comments/>}/>
 
-        <Route path='/users/update/:id' element={<AdminRoute element={<UpdateUser/>} />} />
         <Route path='/admin/dashboard' element={<AdminRoute element={<Users />} />} />
 
 
