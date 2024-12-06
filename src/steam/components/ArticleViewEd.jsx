@@ -70,6 +70,7 @@ function ArticleViewEd(props) {
   }, []);
 
 
+
   return (
     <>
     <Grid item xs={16}>
@@ -86,7 +87,7 @@ function ArticleViewEd(props) {
                 {isMobile && (
                     <CardMedia
                     component="img"
-                    sx={{ width: '100%', height: '26%', display: 'block' }}
+                    sx={{ width: '100%', height: '40%', display: 'block' }}
                     image={post[5]}
                     />)
                 }
@@ -97,7 +98,7 @@ function ArticleViewEd(props) {
                 <Typography variant="subtitle1" paragraph sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
                 {post[6]}
                 </Typography>
-                <Typography variant="subtitle1" color="primary" sx={{fontFamily: 'Didact Gothic, sans-serif' }}>
+                <Typography variant="subtitle1" color="primary" sx={{fontFamily: 'Didact Gothic, sans-serif', marginBottom: '8px'}}>
                 {t("keepReading")}
                 </Typography>
             </CardContent>
