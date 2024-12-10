@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ThemeProvider } from '@emotion/react';
 import { Box, Button, Container, CssBaseline, Fab, Grid, IconButton, MobileStepper, Slide, Tooltip, Typography, createTheme } from '@mui/material';
-import { KeyboardArrowLeft, KeyboardArrowRight, Add} from '@mui/icons-material'
+import { KeyboardArrowLeft, KeyboardArrowRight, Add, ArrowBack} from '@mui/icons-material'
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthStore, useSteamStore } from '../../hooks';
@@ -32,6 +32,25 @@ import Footer from '../components/Footer';
       
       <ThemeProvider theme={theme}>
       <Container maxWidth="lg">
+        <Box
+          sx={{
+            position: "relative",
+            marginTop: "3%",
+            marginBottom: "2%",
+            textAlign: "center", 
+          }}
+        >
+      <IconButton
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0, 
+        }}
+        component={Link}
+        to="/" 
+      >
+        <ArrowBack />
+      </IconButton>
         <Typography
           component="h2"
           variant="h3"
