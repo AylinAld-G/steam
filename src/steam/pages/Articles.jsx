@@ -40,17 +40,17 @@ import Footer from '../components/Footer';
             textAlign: "center", 
           }}
         >
-      <IconButton
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0, 
-        }}
-        component={Link}
-        to="/" 
-      >
-        <ArrowBack />
-      </IconButton>
+          <IconButton
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0, 
+            }}
+            component={Link}
+            to="/" 
+          >
+            <ArrowBack />
+          </IconButton>
         <Typography
           component="h2"
           variant="h3"
@@ -65,6 +65,7 @@ import Footer from '../components/Footer';
         >
           {t("articles")}
         </Typography>
+      </Box>
   
         {/*<Grid container spacing={3}>*/}
 
